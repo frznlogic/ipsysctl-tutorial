@@ -1,0 +1,444 @@
+ <section id="netfilterreference">
+  <title id="netfilterreference.title">Netfilter reference</title>
+
+  <para>
+The variables available in /proc/sys/net/ipv4/netfilter/ all have to do with
+how netfilter and iptables behaves. As of writing this, these variables have
+not entered the mainstream kernel yet, but should within a couple of months.
+If you do not have access to these variables and want them, you need to patch
+your kernel with the tcp-window-tracking patch available in the iptables
+packet patch-o-matic. You can do this by running <command>make patch-o-matic
+KERNEL_DIR=/usr/src/linux</command> in the iptables package, and by making
+sure that you add that specific patch.
+  </para>
+
+  <para>
+Previously, you had to change the connection tracking timings statically in
+the kernel source and then recompile. With this addition, it is much much
+simpler to change the default timeouts for different states among other
+things. You will also have the ability to make nefilter log out of window
+packets as well as packets with invalid window scale values. With this
+addition, netfilter and connection tracking is greatly enhanced and provides
+much better manageability.
+  </para>
+
+  <para>
+In the rest of this section we will look closer at the different variables
+available in sysctl after adding this patch. All of the variables dealing with
+timeouts take their values in jiffies, or a 1/100th part of a second.
+
+  </para>
+
+  <section>
+   <title>ip_ct_generic_timeout</title>
+
+   <para>
+This variable is used to tell the connection tracking code of netfilter the
+generic timeout in case we can not determine the protocol used and use
+more specific values. Any stream or packet that enters the firewall that can
+not be fully identified as any of the other protocol types in this section
+will get a generic timeout set to it.
+   </para>
+
+   <para>
+The ip_ct_generic_timeout variable takes an integer value and is per default
+set to 600 seconds, or 10 minutes. If this is not enough for your
+applications, you should raise it until connections do not crash any longer or
+to an appropriate value.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_icmp_timeout</title>
+
+   <para>
+The ip_ct_icmp_timeout variable is used to set the timeout for ICMP packets
+that will result in return traffic. This should in other words include Echo
+request and reply, Timestamp request and reply, Information request and reply
+and finally Address mask request and reply. Once we see one of the requests,
+we expect to see a return packet, and this is when the ICMP timeout comes into
+the picture.
+   </para>
+
+   <para>
+As we would expect an ICMP reply to be quite quick, we expect the reply to
+have returned to, or through, the firewall within a couple of seconds. The
+ip_ct_icmp_timeout value is in other words rather low, approximately 30
+seconds. This should generally be a good value, unless you live on an
+extremely bad connection.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_be_liberal</title>
+
+   <para>
+This variable changes the behaviour in the state machine regarding TCP out of
+window packets. If this variable is turned off, all of the out of window
+packets are regarded as INVALID in the state machine. If it is turned on, the
+behaviour is much more liberal and only considers out of window RST packets as
+INVALID. It should generally be a good thing to go with this variable turned
+off, and should only be required to turn off during special occasions.
+   </para>
+
+   <para>
+The ip_ct_tcp_be_liberal variable takes a boolean value and is per default set
+to 0, or turned off. All out of window packets are in other words considered
+as INVALID. As already stated, this should in most cases be the wanted
+behaviour.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_log_invalid_scale</title>
+
+   <para>
+The ip_ct_tcp_log_invalid_scale variable is used to tell netfilter to log all
+invalid window scales used in a TCP packets. Window scaling is a specific TCP
+option used in most modern TCP implementations and is described in detail
+within the <link linkend="rfc1323" endterm="rfc1323.title"></link>. If these scales are
+invalid for some reason, this variable tells netfilter to log the packet in
+question.
+   </para>
+
+   <para>
+This variable takes a boolean value and is per default turned on, or set to 1
+in other words. This should generally be a good thing, but if you notice that
+you get a lot of these log entries from some old host or other likely culprit
+you may as well turn this option off.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_log_out_of_window</title>
+
+   <para>
+The ip_ct_tcp_log_out_of_window variable tells netfilter to log all packets
+that are considered as out of window. Generally, this is used in conjunction
+with the previously described ip_ct_tcp_be_liberal variable. All of the
+packets that are defined as out of window, depending on the setting of the
+ip_ct_tcp_be_liberal variable, will be logged if this variable is turned on.
+   </para>
+
+   <para>
+The ip_ct_tcp_log_out_of_window variable takes a boolean value and is per
+default turned on, or set to 1. This should generally be a good idea, but if
+you do receive a lot of error messages due to errors that you can either not
+fix, or that is beyond your reach, you may as well turn this variable off.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_close</title>
+
+   <para>
+This variable sets the timeout of the CLOSE state as defined in RFC 793.
+Briefly, the CLOSE state is entered if the client sends a FIN and then receive
+a FIN from the server, and replies with a FIN/ACK to the FIN sent from the
+server. The CLOSE state is then maintained until we receive a FIN/ACK replying
+the clients original FIN. When the final FIN/ACK arrives we enter the
+TIME-WAIT state.
+   </para>
+
+   <para>
+The default timeout of this variable is set to 1000 jiffies, or 10 seconds.
+Generally, this should be a good value, but if you start noticing that a lot
+of clients gets hung in the CLOSE state, you should raise this value until the
+CLOSE state problem is no longer observed on the clients.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_close_wait</title>
+
+   <para>
+This variable tells netfilter the timeout value of the CLOSE-WAIT state, which
+is also defined in the RFC 793. This state is entered if the client receives
+a FIN packet and then replies with a FIN/ACK packet. When this happens, the
+connection will enter a CLOSE-WAIT state. This state is then maintained until
+the client sends out the final FIN packet, at which time the connection will
+change state to LAST-ACK.
+   </para>
+
+   <para>
+The default value of the ip_ct_tcp_timeout_close_wait variable is set to 43200
+seconds, or 12 hours as of the tcp-window-tracking patch entering the kernel.
+Previously, this was per default set to 60 seconds, which in turn led to a lot
+of badly timed out connections. This timeout should in general be large enough
+to let most connections exit the CLOSE-WAIT state, but if you are having
+problems in the other direction that you are running out of conntrack entries,
+due to a lot of connections getting stuck in the CLOSE-WAIT state, your best
+bet is to either get more memory, or to bring this value down a few hours.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_established</title>
+
+   <para>
+The ip_ct_tcp_timeout_established variable tells us the default timeout value
+for tracked connections in the ESTABLISHED state. All connections that has
+finished the initial 3-way handshake, and that has not seen any kind of FIN
+packets are considered as ESTABLISHED. This is in other words more or less the
+default state for a TCP connection.
+   </para>
+
+   <para>
+Since we never want a connection to be lost on either side of the netfilter
+firewall, this timeout is set extremely high so we do not accidentally erase
+entries that are still used. Per default, the ip_ct_tcp_timeout_established
+variable is set to 432000 seconds, or 5 days.
+   </para>
+
+   <caution>
+    <para>
+You should not consider lowering this variable because you have too many
+active connection tracking entries going. If this is your problem, you should
+be looking at the ip_conntrack_core.c file, function ip_conntrack_init which
+defines the maximum connection tracking entries. Unfortunately, this maximum
+value is static as of writing this, and will probably remain so for a long
+time since each conntrack entry requires a non-swappable memory.
+    </para>
+   </caution>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_fin_wait</title>
+
+   <para>
+The ip_ct_tcp_timeout_fin_wait variable defines the timeout values for both
+the FIN-WAIT-1 and FIN-WAIT-2 states as described in RFC 793. The FIN-WAIT-1
+state is entered when the server send a FIN packet, while the FIN-WAIT-2 state
+is entered when the server receives a FIN/ACK packet from the client in return
+to the initial FIN packet. If the server receive a FIN while still waiting for
+the FIN/ACK packet it enters the CLOSE (defined as CLOSING in RFC 793) state
+instead of FIN-WAIT-2.
+   </para>
+
+   <para>
+The ip_ct_tcp_timeout_fin_wait variable is per default set to 120 seconds, or
+2 minutes. The default here should generally be a good value but may be raised
+in case clients and servers are left in this state because the firewall
+stopped forwarding the packets due to the conntrack entries timing out in
+advance. Of course, if you have problems with conntrack running out of hash
+entries, this value may also be lowered, but not more than allowing the full
+closing handshake to take place on both ends.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_last_ack</title>
+
+   <para>
+The ip_ct_tcp_timeout_last_ack variable sets the timeout value of the LAST-ACK
+state. This state is entered when the client sends a FIN packet in reply to an
+already received and replied FIN packet from the server. This state follows
+the CLOSE-WAIT state and is ended once we receive the final FIN/ACK packet in
+return to our own FIN packet. At this point, the conntrack entry is destroyed
+and we enter the CLOSED state (ie, no conntrack entry at all).
+   </para>
+
+   <para>
+The default value of the ip_ct_tcp_timeout_last_ack variable is set to 30
+seconds and should generally be more than sufficient for the last replying
+FIN/ACK packet, however, in certain cases this value may time out. If this is
+the case, you should try to raise this value. If you are having problems with
+running out of connection entries, you could possibly try to lower this value
+but avoid lowering it so much that your clients are left in a
+LAST-ACK state.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_listen</title>
+
+   <para>
+This value is the initial state that all TCP receiving sockets are set to
+according to RFC 793. In other words, this state is reached for all
+sockets that sits and listens for connecting SYN packets. This state is never
+used in conntrack since conntrack can impossibly know about this state in
+advance since there is no network traffic indicating it. However, it is still
+made available to stay conformant with RFC 793 and perhaps for some other
+reasons that the netfilter core team may have.
+   </para>
+
+   <para>
+This variable is per default set to 120 seconds, or 2 minutes. This could be
+lowered to 0 if you feel like it, but this <emphasis>may</emphasis> lead to
+strange behaviours and really bad problems. Since this value is never really
+used, you can as well leave it at the default value. It will not change any of
+the behaviours of netfilter as it looks now.
+   </para>
+
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_none</title>
+
+   <para>
+This variable is only used for an extremely brief period of time and indicates
+the connection before conntrack actually knows which state to put it in. For
+example, the firewall may never know for sure at what state a specific
+TCP connection is in when it sees the connection for the first time. When it
+sees the first packet, it sets the packet to state NONE. After this, it tries
+to decide at what state this connection is in according to RFC 793. Depending
+on what TCP flags the packet has set, netfilter can derive that the connection
+is in state SYN-SENT, ESTABLISHED, TIME-WAIT or CLOSE.
+   </para>
+
+   <para>
+What all of the above really means, is that the connection is really never in
+the NONE state, or to be more accurate, it is only for an extremely brief
+timeperiod. There should in other words be no real need or usage in lowering
+this states timeout, since it is barely used anyways, and the packet should
+almost never fail to move on to another state from this state.
+   </para>
+
+   <para>
+The ip_ct_tcp_timeout_none variable is per default set to 1800 seconds, or 30
+minutes. This should generally pose no problem as already described and you
+have very little to win by changing this default value.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_syn_recv</title>
+
+   <para>
+The ip_ct_tcp_timeout_syn_recv variable sets the timeout value for the
+SYN-RECEIVED (also known as SYN-RCVD or SYN-RECV) state as defined in RFC 793.
+The SYN-RECEIVED state is entered from the LISTEN or SYN-SENT state once the
+server receives a SYN packet and then replies with a SYN/ACK packet. The
+SYN-RECEIVED state is left for the ESTABLISHED state once the server receives
+the final ACK packet in the 3-way handshake.
+   </para>
+
+   <para>
+The default value of the ip_ct_tcp_timeout_syn_recv variable is 60 seconds, or
+1 minute. This should generally be a good value, but if you do experience
+timeouts where your server or clients end up in a SYN-RECV or SYN-SENT state,
+you should consider raising this value a bit. It is generally a bad idea to
+lower this variable to get over any problems with connections timing out.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_syn_sent</title>
+
+   <para>
+The ip_ct_tcp_timeout_syn_sent state sets the timeout of the SYN-SENT state
+as defined in RFC 793. The SYN-SENT state is entered once the client has sent
+out a SYN packet and is still awaiting the returning SYN/ACK packet. The
+SYN-SENT state is then left for the SYN-RCVD or ESTABLISHED states once we get
+the SYN/ACK packet.
+   </para>
+
+   <para>
+The default value of the ip_ct_tcp_timeout_syn_sent variable is set to 120
+seconds, or 2 minutes. This should generally be a good setting, but if you
+experience problems where the client and server gets stuck in a SYN-SENT or
+SYN-RCVD state, you may possibly need to raise this value. It is generally a
+bad idea to lower this value to get around problems with not having enough
+conntrack entries.
+
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_tcp_timeout_time_wait</title>
+
+   <para>
+The ip_ct_tcp_timeout_time_wait variable defines the timeout value of the
+TIME-WAIT state as defined by RFC 793. This is the final state possible in a
+TCP connection. When a connection is closed in both directions, the server and
+client enters the TIME-WAIT state, which is used so that all stale packets
+have time to enter the client or server. One example of the usage of this may
+be if packets are reordered during transit between the hosts and winds up in a
+different order at either side. In such a case, the timewindow defined in the
+ip_ct_tcp_timeout_time_wait variable is used so that those packets may reach
+their destinations anyways. When the timeout expires, the conntrack entry is
+destroyed and we enter the state CLOSED, which means that there is no
+conntrack data at all for the connection in question.
+   </para>
+
+   <para>
+The default value of the ip_ct_tcp_timeout_time_wait variable is set to 120
+seconds, or 2 minutes. You should generally want to keep this value if you
+know that you live on a connection that is slow and that often reorders the
+packets in question. If this value is too low you will often experience
+corrupt downloads or missing data in downloaded data, you should definitely
+avoid tuning this value down in such a case, and you may most definitely
+consider raising the timeout of this value in such case. If you never
+experience such behaviour or any other problems like that, you may most
+probably lower this value so that conntrack entries die faster, and hence
+recycle the conntrack entry space faster.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_udp_timeout</title>
+
+   <para>
+The ip_ct_udp_timeout variable specifies the timeout for initial UDP packets
+in a connection. When a UDP connection is initialized, the UDP packet enters
+an NEW and then ESTABLISHED state once it has seen return traffic to the
+original UDP packet. However, it maintains the same timeout until it has seen
+several packets go back and forth and becomes assured, at which point it is
+instead considered a stream.
+   </para>
+
+   <para>
+While this initial state is maintained, the default timeout is 30 seconds. If
+you are using UDP protocols that send very little data during longer
+timeframes, you should consider raising this value so that the state machine
+is able to keep track of your connections properly. It is generally a bad idea
+to lower this, unless you know that your hosts sends UDP packets very often
+and don't expect a lot of late replies, which would mean a lot of unnecessary
+open conntrack entries.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ip_ct_udp_timeout_stream</title>
+
+   <para>
+The ip_ct_udp_timeout_stream variable specifies the timeout values of the UDP
+streams once they have sent enough packets to reach the assured state. This
+state is normally reached for connections that send a lot of data and
+relatively often, such as streaming services or ICQ. Examples of streaming
+services may be certain realplayer servers, or speak freely. This value should
+always be larger than the initial timeout value for UDP streams since it is
+used on connections that we know for sure expects a lot of traffic back and
+forth, even though it may not be very often.
+   </para>
+
+   <para>
+The ip_ct_udp_timeout_stream variable is per default set to 180 seconds, or 3
+minutes in recent kernels. If you are having problems with connections timing
+out, you may try raising this value a bit. It is generally a bad idea to lower
+this value, since the connection will be destroyed once it times out from this
+state. Unfortunately, UDP is a stateless protocol, so it is very hard to
+derive any specific states of the connections. Because of this, there is no
+specific conntrack timeouts for UDP streams that are about to close, or that
+has closed.
+   </para>
+
+  </section>
+
+ </section>

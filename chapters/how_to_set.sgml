@@ -1,0 +1,248 @@
+<chapter id="howtosetvariables">
+ <title id="howtosetvariables.title">How to set variables</title>
+
+ <para>
+The ipsysctl variables may be set in two different ways which entails two
+totally different methods. The first one is via the sysctl application
+provided with most distributions per default these days. The other way entails
+using the /proc filesystem, which should come with any linux installation as
+long as you have a kernel that has /proc filesystem turned on. In other words,
+any linux system you find should contain the /proc filesystem).
+ </para>
+
+ <para>
+The sysctl command is a bit more complex than the /proc filesystem, depending
+on how you see things. Also, as already mentioned, if you use the sysctl
+application you need more than just the kernel which is almost all that is
+required via the /proc filesystem. One of the better things with the sysctl
+command is that it is much easier to maintain a larger listing of changes that
+we may want to do. All of the changes that we want to use on the system can
+then be saved into a special configuration file which contains all of the
+variables and their values. This way of doing things is in other words more
+suitable for setting variables that we want to use under all circumstances.
+ </para>
+
+ <para>
+The /proc filesystem way of doing things is a little bit easier while tweaking
+around with settings. When we finally have figured out the proper setting, we
+may as well set it in the sysctl.conf file and see to it that sysctl is run
+upon boot, and we will always have our settings set to kernel. Command lines
+in a script which sets variables through the /proc filesystem will look much
+worse than sysctl commands and they are generally less readable. Therefore, if
+you are planning to implement a huge set of ipsysctl settings in a script or
+another, or if you figure out that you need to set a lot of them, then you
+should generally try to use the sysctl command instead.
+ </para>
+
+ <section id="withthesysctl">
+  <title id="withthesysctl.title">With the sysctl application</title>
+
+  <para>
+The sysctl application can be used to either set variables through the command
+line, or to set a larger set of variables through a configuration file as
+previously described. sysctl may also set several variables through the
+command line at once if need be, and it may also be used to list all variables
+and their respective values. First of all, to list all variables possible you
+could issue the following command:
+  </para>
+
+  <para>
+   <command>sysctl -a</command>
+  </para>
+
+  <para>
+This should list all the variables and their values separated by a "=" sign.
+The -a or -A sign will display all possible variables and their values. The -a
+option will list all variables separated from the values with a "=", while -A
+will show the variables and values in a table form. As of writing this, -A
+does not work, but should hopefully do so in the close future.
+  </para>
+
+  <para>
+As you can see there are a lot of variables really, but most of them do not
+pertain to ipsysctl in specific. Also note the dotted notation of the
+variables. In sysctl, variables switch the "/" sign for the "." sign to
+separate different levels. sysctl will accept "/" instead of "." and there
+should be no problem really with this, but just as a note on how things look.
+If you would only like to read a specific variable, you would do the
+following:
+  </para>
+
+  <para>
+   <command>sysctl net.ipv4.tcp_sack</command>
+  </para>
+
+  <para>
+If we would like to set a value with sysctl we would send the -w option to the
+command and then the variable we would like to write to and the new value
+separated by an equal sign. This would then look like this:
+  </para>
+
+  <para>
+   <command>sysctl -w net.ipv4.tcp_sack=0</command>
+  </para>
+
+  <para>
+This will set the tcp_sack value to 0, then print the variable with its new
+value and exit. Nothing strange in other words. If we would instead like to
+load the configuration file as explained previously, we would run the
+following command:
+  </para>
+
+  <para>
+   <command>sysctl -p</command>
+  </para>
+
+  <para>
+This will load all of the settings we have in the /etc/sysctl.conf file. If we
+would instead like to use another file than the default one, we would specify
+the file we would like to use after the -p option, like this:
+  </para>
+
+  <para>
+   <command>sysctl -p /etc/testsysctl.conf</command>
+  </para>
+
+  <para>
+This would then load the testsysctl.conf configuration options instead of our
+default file. The sysctl.conf file is very basic and don't take a lot of
+settings. First of all, a line starting with a ; or # is a comment as usual,
+and all commands starts with the path to the variable, including the variable
+name, and then an equal sign followed by the value to set the variable to. The
+path to the variable is relative to /proc/sys as with all of these settings.
+An example sysctl.conf file would look like this:
+  </para>
+
+  <screen width="80">
+# This is a comment
+net.ipv4.ip_forward = 0
+net.ipv4.conf.all.rp_filter = 1
+kernel.sysrq = 0
+  </screen>
+
+  <para>
+This file will set net.ipv4.ip_forward to 0, or in other words turn it off,
+which means that no IP packets will be forwarded between interfaces, if you
+want to share your internet connection to one or more other computers, this
+should be turned on. net.ipv4.conf.all.rp_filter will turn on routing policy
+filters. This setting tells the kernel to automatically filter packets based
+on their source address depending on where they come from.
+  </para>
+
+  <para>
+Finally, kernel.sysrq does not have anything to do with networking really, it
+is a setting that turns off the sysrq key combination that can be used if the
+system has crashed. This value was added to show that there exist a lot of
+other settings than the ipsysctl settings in sysctl.
+  </para>
+
+ </section>
+
+ <section id="withproc">
+  <title id="withproc.title">With /proc</title>
+
+  <para>
+The proc filesystem may very well be used to set all values in ipsysctl,
+however, this way of setting and reading variables should probably be more
+suitable for experimenting, and when we do not have access to the sysctl tool.
+This is also very good when we are dealing with certain variables that should
+not be turned on before a specific time in bootup. For example, it may be a
+very bad idea to turn on ip_forward before we have all the firewall rules and
+routes up and running.
+  </para>
+
+  <para>
+All you need to use this method of reading and setting variables is the cat
+and echo commands as well as a standard shell such as bash. It is highly
+unlikely that you do not have any of these since all distributions carry these
+and should be more or less impossible to not install with the installation
+process.
+  </para>
+
+  <para>
+First of all, all variables that may be used to change the default behaviour
+on your system resides in the /proc/sys/ directory. The settings that we are
+interested in during this tutorial are all placed within the
+/proc/sys/net/ipv4 directory. In other words, all you need to do to go there
+is the following command
+  </para>
+
+  <para>
+   <command>cd /proc/sys/net/ipv4</command>
+  </para>
+
+  <para>
+To see all the variables available, issue the following command
+  </para>
+
+  <para>
+   <command>ls</command>
+  </para>
+
+  <para>
+In other words, you should know about all of this already. If you don't, you
+are probably reading the wrong documentation. To see the setting in a specific
+variable, you would issue the <command>cat ip_forward</command> command. This
+would look something like this:
+  </para>
+
+   <screen width="80">
+[blueflux@work1 ipv4]$ <command>cat ip_forward</command>
+0
+[blueflux@work1 ipv4]$
+   </screen>
+
+  <para>
+As you can see, these variables can be read by anyone who has an account on
+the machine in question. This could pose as a small security problem since
+anyone who gets on to your linux computer will be able to figure out all of
+your exact settings without too much hassle.
+  </para>
+
+  <caution>
+   <para>
+It is unfortunately impossible to block read access to the 
+<filename>/proc</filename> filesystem as of writing this. The problem is 
+that all read/write permissions are hardcoded within the 
+<filename>/proc</filename> filesystem itself. and because of this, it is 
+impossible to change the settings manually. If you really really need to 
+change these settings, you can do it for the whole system from within 
+the <filename>linux/fs/proc</filename> directory, which contains the 
+source code for the Linux <filename>/proc</filename> filesystem.
+   </para>
+  </caution>
+
+  <para>
+If we would like to change the above setting we would use the echo command.
+The echo command will normally echo any line we provide it with back to us on
+the screen. However, this could be piped via pretty much any standard shell to
+the file that we would like to save it in. This could then look like the
+following in bash:
+  </para>
+
+   <screen width="80">
+[root@work1 ipv4]# <command>echo "1" &gt; ip_forward</command>
+[root@work1 ipv4]#
+   </screen>
+
+  <para>
+As you can see, this time around we need to have root access to set the
+variable value. If we do not have root access, we would get the following
+error message:
+  </para>
+
+   <screen width="80">
+[blueflux@work1 ipv4]$ <command>echo "1" &gt; ip_forward</command>
+bash: ip_forward: Permission denied
+[blueflux@work1 ipv4]$
+   </screen>
+
+  <para>
+Do note that all the above examples takes into account that we are already
+within the the correct directory in the proc filesystem. This is the reason
+why we have not written the complete path to the variables.
+  </para>
+
+ </section>
+
+</chapter>

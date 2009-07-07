@@ -1,0 +1,32 @@
+<appendix id="history">
+ <title id="history.title">History</title>
+
+ <literallayout>
+Version 1.0.4 (21 May 2003)
+http://ipsysctl-tutorial.frozentux.net
+By: Oskar Andreasson
+
+Version 1.0.3 (26 Apr 2003)
+http://ipsysctl-tutorial.frozentux.net
+By: Oskar Andreasson
+Contributors: Don Cohen, Martin A. Brown and Brian Tierney.
+
+Version 1.0.2 (19 Dec 2002)
+http://ipsysctl-tutorial.frozentux.net
+By: Oskar Andreasson
+Contributors: Alan Cox, Michael T. Babcock, Don Cohen and several others.
+
+Version 1.0.1 (23 Oct 2002)
+http://ipsysctl-tutorial.frozentux.net
+By: Oskar Andreasson
+Contributors: William Stearns, Don Gould, Mattias Webjörn Eriksson and
+Michael Bussmann.
+
+Version 1.0.0 (8 Oct 2002)
+http://ipsysctl-tutorial.frozentux.net
+By: Oskar Andreasson
+Contributors: Jozsef Kadlecsik, Nivedita Singhvi, JuanJo Ciarlanti and 
+Alexey Kuznetsov
+ </literallayout>
+
+</appendix>

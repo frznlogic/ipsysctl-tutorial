@@ -1,0 +1,366 @@
+ <section id="theconfvariables">
+  <title id="theconfvariables.title">The conf/ variables</title>
+
+   <para> The conf directory is split up in several different directories
+which in turn contains a lot of settings that may be done. If you look
+closer at this directory listing you will see that most of the directories
+corresponds to your network interface names, such as
+<systemitem>eth0</systemitem>, <systemitem>tr0</systemitem> or
+<systemitem>lo</systemitem>. These directories allows you to set different
+values depending on the different network interfaces. There are also the
+<filename>all</filename> and <filename>default</filename> directories
+which contains variables which will change the specific behaviour of all
+the different network interfaces. The listing of the conf directory may
+look like shown in the listing below.
+   </para>
+
+   <screen width="80">
+root@firewall:/proc/sys/net/ipv4/conf# <command>ls -l</command>
+total 0
+dr-xr-xr-x    2 root     root            0 May  1 20:04 all/
+dr-xr-xr-x    2 root     root            0 May  1 20:04 default/
+dr-xr-xr-x    2 root     root            0 May  1 20:04 eth0/
+dr-xr-xr-x    2 root     root            0 May  1 20:04 eth1/
+dr-xr-xr-x    2 root     root            0 May  1 20:04 eth2/
+dr-xr-xr-x    2 root     root            0 May  1 20:04 eth3/
+dr-xr-xr-x    2 root     root            0 May  1 20:04 lo/
+root@firewall:/proc/sys/net/ipv4/conf#
+   </screen>
+
+   <para>
+In the above configuration, we have 4 different ethernet adapters (eth0-3) and
+one lo adapter. Everyone should have the lo, or localhost, adapter since it is
+an integral part of most - if not all - unix systems, as long as it has 
+any kind of network stack.
+   </para>
+
+
+   <section>
+    <title>conf/DEV/, conf/all/ and conf/default/ differences</title>
+
+   <para>
+The <filename>/conf/DEV/</filename> directory, where DEV stands for some 
+device or another, will only change the behaviour of the specific device in
+question. Now, <filename>conf/all/</filename> on the other hand will change
+the behaviour of <emphasis>all</emphasis> the other interfaces if changed.
+   </para>
+
+   <para>
+The final directory named <filename>conf/default/</filename> will change the 
+default values. This doesn't change the values in the already set up devices, 
+but it will change the default values used for all the interfaces that may be 
+brought up in the future. One usage would be if we set up a new interface 
+eth0, change the <filename>conf/eth0</filename> variables for it, and finally 
+set the defaults used. If we would then load five modems on ppp+, these
+variables would change since the default variables have changed.
+   </para>
+  </section>
+
+  <section>
+   <title>accept_redirects</title>
+
+   <para>
+This variable tells your system whether it should accept ICMP redirects or 
+not. ICMP redirects are normally used to tell a router, or sometimes 
+hosts, that there is a better way to send the packets to specific 
+hosts or networks, which is faster or is less congested. 
+   </para>
+
+   <para> This value takes a boolean value, and is turned off if it is set
+to 0 and turned on if it is set to 1. Per default, Linux does accept
+redirects, but I suggest you turn it off since it is generally considered
+as a security risk. Most machines should never have any specific
+requirements to accept being redirected, and hence you should mostly keep this
+setting off, unless you know that you will seriously need redirects once in a
+while.
+   </para>
+  </section>
+
+  <section>
+   <title>accept_source_route</title>
+
+   <para>
+This variable tells the kernel if it should allow source routed packets or
+not. Source routed packets are generally looked upon as a security risk, and
+generally bad. For more information about source routing, see the <link
+linkend="ipparam.txt" endterm="ipparam.txt.title"></link> document.
+   </para>
+
+   <para>
+This variable is per default turned on in all kernels. Of course, it takes a
+boolean value, and may be turned on (1) or off (0).
+   </para>
+  </section>
+
+  <section>
+   <title>arp_filter</title>
+
+   <para>
+The arp_filter variable tells the kernel whether the IP address should be bound
+to a specific ARP address or not. The kernel decides to answer a specific packet 
+incoming on a specific interface, if it decides that it would also send the 
+reply back out through the same interface. This is what happens if you turn this 
+option on. In general, it is a good idea to answer on an IP address bound to 
+this computer be answered from whichever interface the packet was received 
+on. However, in some cases, this may cause troubles.
+   </para>
+
+   <para>
+In general, we should only turn this variable on if we are doing load-balancing,
+otherwise it should be turned off. Per default, this variable is turned off, 
+since it is somewhat breaking the new thoughts about IP addresses. Previously, 
+IP addresses where looked upon as a way of reaching a specific device on a piece 
+of hardware, today, it is looked upon as a separate service in a way, which 
+means that we should (and generally are) answering requests for a specific IP 
+address, not depending on where we received it.
+   </para>
+
+   <tip>
+    <para>
+For more information about ARP fluxing, I suggest that you read the information 
+available in the <link linkend="guideipunderlinux" 
+endterm="guideipunderlinux.title"></link> document.
+    </para>
+   </tip>
+
+  </section>
+
+
+  <section>
+   <title>bootp_relay</title>
+
+   <para>
+The bootp_relay variable is supposed to accept packets with source address of
+0.b.c.d destined not to this host as local packets. The BOOTP relay daemon
+will then catch these packets and forward them to the correct destination.
+   </para>
+
+   <para>
+The bootp_relay variable takes a boolean value, and is per default turned off.
+It can either be turned on (1), or off (0). See the caution admonition before
+turning it on.
+   </para>
+
+   <caution>
+    <para>
+The bootp_relay variable is not implemented yet, hence this very short
+description. If you have needs of this, you should be welcome to implement it
+properly. If you want to implement this, you should get in touch with the
+<link linkend="netdevmailing">netdev mailinglist</link> to find out more
+specific information.
+    </para>
+   </caution>
+  </section>
+
+  <section>
+   <title>forwarding</title>
+
+   <para>
+This variable tells us if IP forwarding is turned on for a specific device.
+This could be used to turn on only forwarding between 2 devices, while the
+third is turned off. Hence, we limit which subnets has access to what. The
+value in this variable defaults to the same value as
+<filename>ipv4/ip_forward</filename>, so if you turn on ip_forward, all of
+these variables will change to 1 (on), and if you turn ip_forward off, all of
+the variables will be switched to 0 (off).
+   </para>
+  </section>
+
+  <section>
+   <title>log_martians</title>
+
+   <para>
+This variable tells the kernel to log all packets that contains impossible
+addresses to the kernel logging facility. An impossible IP address may 
+mean an IP address that we do not know how to contact, since the IP
+address is not contained in the routing tables. 
+   </para>
+
+   <caution>
+   <para> The log_martians will increase verbosity under specific
+circumstances, but you should be aware that it is not as verbose as one
+may think. The main problems getting logged by this option are impossible
+redirects, bad classes, limited broadcasts or otherwise invalid according
+to the <systemitem>Forwarding Information Base</systemitem>
+(<systemitem>FIB</systemitem>). This may sound much, but the sircumstances
+are rather restrictive before anything gets logged.
+   </para>
+   </caution>
+
+   <para>
+Martian logging takes a boolean value, where 1 turns it on and 0 turns it
+off. Per default it is turned off.
+   </para>
+  </section>
+
+  <section>
+   <title>mc_forwarding</title>
+
+   <para>
+This option turns on multicast routing for the specific device that we are
+configuring. To do this, the kernel must be configured and compiled with
+CONFIG_MROUTE. Additionally, you need a routing daemon that is available at
+<ulink url="ftp://ftp.research.att.com/dist/fenner/mrouted">AT&amp;T 
+Research FTP site.</ulink>. This is a Multicast routing daemon that 
+implements DVMRP. Another Multicast routing daemon that is available is 
+the <ulink url="http://netweb.usc.edu/pim/">PIMd</ulink>. PIMd implements 
+the PIM (Protocol Independent Multicast) multicast routing protocol, in 
+sparse mode. There are also links to other PIM-DM (Protocol Independent 
+Multicast--Dense Mode) and PIM-SM (Protocol Independant Multicast--Sparse 
+Mode) implementations from the last site. If you need more information 
+about Multicasting under Linux, I suggest you read the <ulink 
+url="http://www.tldp.org/HOWTO/Multicast-HOWTO.html">Multicast 
+HOWTO</ulink> which contains tons of information about multicasting.
+   </para>
+
+   <para> Briefly, The main usage of multicast is to send packets to
+several different hosts, on different networks. For example, a webpage is
+OK to send once to everyone who wants to see it, but if we want to have a
+video conference or video stream to several hundreds of users at once, we
+have two options of doing this. Either we send the packets once to every
+host, which means we will have to send hundreds of packets at the same
+time, and thus draining our bandwidth. The other solution is to use
+Multicast, in which case we only send one packet, and the packet will then
+be multiplexed along the road so that everyone who wants to receive the
+specific stream will get it.
+   </para>
+
+   <para>
+This option takes a boolean value, and is per default turned off. Note 
+that you do not need to turn it on, if you want your host to just listen 
+to multicast packets. This is only needed if you want to forward multicast 
+over the box.
+   </para>
+
+  </section>
+
+  <section>
+   <title>proxy_arp</title>
+
+   <para>
+This variable sets Proxy ARP on or off in kernel for specific devices. 
+Proxy ARP is a system of automatically answering ARP queries for other 
+hosts, that may for example be located on other network segments that we 
+have contact with. This may be necessary under certain circumstances, 
+where other routers do not know how to reach specific networks or hosts. 
+The Linux firewall/router may then answer the ARP queries on behalf of the 
+hosts that we want to Proxy ARP for. 
+   </para>
+
+   <para>
+Proxy ARP is turned on for the network segment that we want to answer ARP 
+queries for. We will then answer all ARP queries for that specific network 
+or host, hence receiving the packets destined for the specific host, and 
+we can then send them onwards to the real host.
+   </para>
+
+   <para>
+The proxy_arp variables takes a boolean value. Per default, it is turned 
+off, and may be turned on (1) or off (2) at will. If you want more 
+information about Proxy ARP, read the <ulink 
+url="http://www.ibiblio.org/pub/Linux/docs/HOWTO/unmaintained/mini/Proxy-ARP">Proxy-ARP 
+mini HOWTO</ulink>.
+   </para>
+  </section>
+
+  <section>
+   <title>rp_filter</title>
+
+   <para>
+The rp_filter variable sets up a reverse patch (rp) filter on the specific
+interface. What this means, is quite simple. All it does, is to validate that
+the actual source address used by packets correlates properly with our routing
+table, and that packets with this specific source IP address are supposed to
+get their replies back through that interface again.
+   </para>
+
+   <caution>
+    <para>
+If you are using policy routing, or advanced routing, in one way or another,
+you are seriously suggested to turn the rp_filter variable off, since it may
+cause packets to be dropped. For example, if you have set up your routers to
+receive packets through one of them, and send outgoing packets through the
+other one. Now, if your webserver is connected through one interface to the
+incoming router, and one to the outgoing router, and the rp_filter variable is
+turned on, it will simply drop all incoming packets since the packets are not
+coming in to the webserver through the propriate interface in accordance to
+the routing table.
+    </para>
+   </caution>
+
+   <para>
+The variable takes a boolean value, and is per default turned off. However, a
+lot of Linux distributions turns on rp_filter through their startup scripts.
+Hence, if rp_filter is turned on, on your distribution and you want it turned
+off, start by looking at the <filename>rc.d</filename> scripts. The variable
+can either be turned off (0), or on (1).
+   </para>
+
+   <tip>
+    <para>
+The behaviour of the rp_filter variable is specified in <link
+linkend="rfc1812" endterm="rfc1812.title"></link> on pages 46-49 (section
+4.2.2.11), page 55 (section 4.3.2.7) and page 90 (section 5.3.3.3). If you are
+doing serious routing, you should carefully read this document anyways.
+    </para>
+   </tip>
+  </section>
+
+  <section>
+   <title>secure_redirects</title>
+
+   <para> This variable turns on secure redirects. If it is turned off,
+the Linux kernel will accept ICMP redirects from any host, anywhere.
+However, if it is turned on, ICMP redirects will only be accepted from
+gateways listed in the default gateway list. This way we can get rid of
+most illegal redirects that can be used to log your traffic and grab
+sensitive data, such as passwords etcetera.
+   </para>
+
+   <para>
+The secure_redirects variable takes a boolean value and is per default 
+turned on. It may both be turned on or turned off. Note that this variable 
+is overridden by the shared_media variable, so to turn this one on, you 
+must turn on shared_media as well. 
+   </para>
+
+  </section>
+
+  <section>
+   <title>send_redirects</title>
+
+   <para>
+The send_redirects option tells the Linux kernel to send out ICMP redirects to
+other hosts. This should only be turned on, if the computer acts as a router
+of some sort. The ICMP redirects are mainly sent out to hosts, if we for
+example know that the other router/host should instead contact another server
+on their same subnet as the one we are receiving the packets on.
+   </para>
+
+   <para>
+The send_redirects variable takes a boolean value and is per default turned
+on. It can take the values 0 (off) and 1 (on). In most cases where the
+computer is not running as a router of some kind, we could safely turn it off.
+   </para>
+  </section>
+
+  <section>
+   <title>shared_media</title>
+
+   <para>
+The shared_media setting tells the kernel if the physical network
+connected to a specific network card is a shared media or not. For
+example, if several different IP networks with different netmasks operate
+over the same physical media or not. The main effect that this variable
+makes, is to tell the kernel whether it should send ICMP redirects to
+specific networks or not.
+   </para>
+
+   <para>
+Per default this variable is turned on. It takes a boolean value, and may
+hence be turned on or off. Note that this variable overrides
+secure_redirects below.
+   </para>
+  </section>
+
+ </section>

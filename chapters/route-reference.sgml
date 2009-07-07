@@ -1,0 +1,240 @@
+ <section id="routereference">
+  <title id="routereference.title">Route reference</title>
+
+  <para>
+The route/ section of the IPv4 sysctl's contains mainly some loosely 
+related variables that changes the effect in the route cache, or 
+the routing code in the kernel. Some will simply change how many 
+error/warning messages are printed by the routing code, and others will 
+change the garbage collection timings in the route cache.
+  </para>
+
+  <section id="errorburst">
+   <title id="errorburst.title">error_burst</title>
+
+   <para>
+This variables is used in conjunction with <command>error_cost</command> to
+limit how many ICMP destination unreachable messages the routing code will
+send out. This variable tells the function the maximum amount of tokens that
+we have available, while the <command>error_cost</command> variable tells us
+how many tokens are used up by each ICMP destination unreachable packet. If
+<command>error_burst</command> is emptied and we receive more packets for that
+host, we will ignore them.
+   </para>
+
+   <note>
+    <para>
+ICMP destination unreachable messages are generally sent when our host, or 
+router, does not know how to reach a specific host or network. This may be for
+three basic reasons:
+    </para>
+
+    <orderedlist>
+     <listitem>
+<para>We can not reach the nexthop to the destination.</para>
+     </listitem>
+
+     <listitem>
+<para>We have no route set up for the network segment or host.</para>
+     </listitem>
+
+     <listitem>
+<para>We have a routing rule or route set to unreachable, throw or 
+prohibit.</para>
+     </listitem>
+    </orderedlist>
+
+    <para>
+During these three sircumstances, the networking code sends out ICMP
+Destination Unreachable messages with three different codes if necessary:
+    </para>
+
+    <orderedlist>
+     <listitem>
+<para>ICMP host unreachable in case the host should be directly connected to a
+network we are part of, or if the host was set to unreachable or throw through
+a rule or route.</para>
+     </listitem>
+
+     <listitem>
+<para>ICMP network unreachable if we do not know how to reach the network in
+question, or if the network was set to unreachable or throw through a rule or
+route.</para>
+     </listitem>
+
+     <listitem>
+<para>ICMP communication administratively prohibited by filtering is sent if 
+we have a rule or route set to prohibit.</para>
+     </listitem>
+    </orderedlist>
+
+   </note>
+
+   <para>
+The <command>error_burst</command> variable is per default set to 500 and
+takes an integer value. Together with the default value of
+<command>error_cost</command> this means that we allow the routing code to
+send 5 ICMP Destination unreachables per second.
+   </para>
+
+  </section>
+
+  <section id="errorcost">
+   <title id="errorcost.title">error_cost</title>
+
+   <para>
+For a complete explanation, see the <link linkend="errorburst"
+endterm="errorburst.title"></link> variable. Basically, this variable sets the
+cost of sending a single ICMP destination unreachable to someone.
+   </para>
+
+   <para>
+The <command>error_cost</command> variable is per default set to 100, which
+means we can send a maximum of 5 ICMP destination unreachables per second,
+together with the default value of <command>error_burst</command>.
+   </para>
+
+  </section>
+
+  <section id="flush">
+   <title id="flush.title">flush</title>
+
+   <para>
+This variable is extremely simple in use. It can not be read since it contains 
+no real data. If you write anything to it as root, it will simply flush the 
+whole <systemitem>routing cache</systemitem>. For example, if you know that a 
+route has changed somewhere, you would simply echo something into this file, 
+and the route cache will be emptied. If you would like to read the route cache,
+take a look at the <filename>/proc/net/rt_cache</filename>. This file contains 
+a lot of information about the routes currently in the cache. 
+   </para>
+
+  </section>
+
+  <section id="gcelasticity">
+   <title id="gcelasticity.title">gc_elasticity</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="gcinterval">
+   <title id="gcinterval.title">gc_interval</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="gcmininterval">
+   <title id="gcmininterval.title">gc_min_interval</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="gcthresh">
+   <title id="gcthresh.title">gc_thresh</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="gctimeout">
+   <title id="gctimeout.title">gc_timeout</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="maxdelay">
+   <title id="maxdelay.title">max_delay</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="maxsize">
+   <title id="maxsize.title">max_size</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="minadvmss">
+   <title id="minadvmss.title">min_adv_mss</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="mindelay">
+   <title id="mindelay.title">min_delay</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="minpmtu">
+   <title id="minpmtu.title">min_pmtu</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="mtuexpires">
+   <title id="mtuexpires.title">mtu_expires</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="redirectload">
+   <title id="redirectload.title">redirect_load</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="redirectnumber">
+   <title id="redirectnumber.title">redirect_number</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+  <section id="redirectsilence">
+   <title id="redirectsilence.title">redirect_silence</title>
+
+   <para>
+
+   </para>
+
+  </section>
+
+ </section>

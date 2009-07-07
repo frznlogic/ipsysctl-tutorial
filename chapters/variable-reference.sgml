@@ -1,0 +1,1518 @@
+<chapter id="variablereference">
+ <title id="variablereference.title">IPv4 variable reference</title>
+
+ <para>
+This chapter will go through each and one of the IPv4 variables possible
+to set via sysctl or the proc filesystem. You will be provided with a
+basic explanation on what behaviour the variable will change and how, as
+well as default behaviour, if possible, and what values the variable may
+be set to. We will not go into any deeper discussion about why each
+variable should be changed unless there are any very normal reasons to
+change the values. The structure used within this reference chapter will
+follow the same structure as the structure used within ipsysctl structure,
+as well as the default ipv4 directory being further structured due to its
+large size and mix of many different variables.
+ </para>
+
+ <section>
+  <title>IP Variables</title>
+
+  <para>
+This list contains all of the variables available in a standard 2.4.x kernel
+that pertains to the IP settings. As you will see, there is a huge set of
+them, and some should be properly set from the beginning for you, and others
+may not be so properly set. Most of them should look quite proper, however,
+some do require some extra configuration depending on your needs, but most
+should be decently set for you as is.
+  </para>
+
+  <section>
+   <title>ip_autoconfig</title>
+
+   <para>
+   </para>
+  </section>
+
+  <section>
+   <title>ip_default_ttl</title>
+
+   <para>
+The ip_default_ttl variable tells the kernel what Time To Live to set as
+default on packets that leaves this host. This tells how long the packets may
+live on the internet before they are dropped. Each time the packet passes a
+router, firewall, computer, etcetera, the TTL is decremented with one step.
+   </para>
+
+   <para> The default value for ip_default_ttl is 64, which is a fairly
+good TTL which will not cause too much trouble. It is very unlikely to
+time out in transit to the host in question. This variable takes an
+unsigned integer, but the actual TTL field is only 8 bit long. The value
+may in other words be as high as 255 and as low as 0, however 255 could be
+considered rude and 0 wouldn't leave your computer at all. 64 is a good
+value, unless you are trying to connect to computers extremely far away
+counted in hops or jumps. These would then time out. As it looks today, I
+have pretty much never seen a host that lives more than 30 hops away on
+the internet, so I don't think there is any need to make this value higher
+than the default value for now.
+   </para>
+
+   <para>
+Setting the TTL to 255 would be considered rude since this would make a
+packet live an extremely long time on the internet. If there would be a
+glitch in 2 routers, this packet could bounce back and forth for a huge amount
+of time, eating away on the bandwidth without any reason at all. Normally,
+don't set this value higher than 100 or something alike.
+   </para>
+  </section>
+
+  <section>
+   <title>ip_dynaddr</title>
+
+   <para>
+The ip_dynaddr variable is used to allow a few problems with dynamic
+addressing to be fixed. This allows diald oneshot connections to get
+established by dynamically changing packet source address, and sockets if
+local processes. This option was implemented for TCP diald-box connections and
+Masquerading connections. Masquerading will in other words work 100% with this
+option, letting Masquerading switch source adress of packets if the boxes own
+address change.
+   </para>
+
+   <para>
+This option takes an integer, but only makes use of 3 possible states, 0, 1 or
+2.
+   </para>
+
+   <itemizedlist mark="bullet">
+    <listitem><para>0 means that this option is turned off, which is also the
+default behaviour.</para></listitem>
+
+    <listitem><para>1 means that the option is enabled and
+running.</para></listitem>
+
+    <listitem><para>Any non 0 or 1 values means that we have
+turned on verbose mode, which in turn will add extra debugging messages that
+you may use to get things to work properly.</para></listitem>
+
+   </itemizedlist>
+
+   <para>
+If this variable is turned on and forwarding interface changes, this is what
+may happen
+   </para>
+
+   <itemizedlist mark="bullet">
+    <listitem><para>Socket and packet source address is rewritten on
+retransmissions while in SYN_SENT state. This is the diald-box
+processes.</para></listitem>
+
+    <listitem><para>Outbound masqueraded source address changes on
+output, when internal host does retransmission, until a packet from the
+outside is received by the tunnel.</para></listitem>
+   </itemizedlist>
+
+   <para>
+This is especially helpful for auto-dialup links (diald), where the actual
+outgoing address is unknown at the moment the link is going up. This enables
+the same, local and masqueraded, connection requests that brought the link up
+to actually establish their connections. This means that we will not have to
+first issue an connection request just to bring the connection up, and then
+have to issue the "real" connection request when we have actually established
+the connection.
+   </para>
+  </section>
+
+  <section>
+   <title>ip_forward</title>
+
+   <para>
+The ip_forward variable is used to turn IP forwarding on or off. This means
+that we can turn off the functions for forwarding packets between interfaces,
+which lets the computer act as a firewall, or router. Note that this is an
+extremely important variable for Network Address Translation, firewalling,
+routing, masquerading, and all other things where we actually let packets
+through the box to another network, as you can understand.
+   </para>
+
+   <para>
+This is an boolean variable. In other words, it will take a 1 or a 0. The
+default value for this variable is 0, or disabled. As you can understand, 0
+means disabled and 1 means enabled.
+   </para>
+
+   <para>
+Note that this is an very special variable since it will reset all
+configuration parameters to their default states if it is changed. For a
+complete list of the exact states, look closer at <ulink
+url="other/rfc1122.txt">RFC1122</ulink> for hosts and <ulink
+url="other/rfc1812.txt">RFC1812</ulink> for routers.
+   </para>
+  </section>
+
+  <section>
+   <title>ip_local_port_range</title>
+
+   <para>
+The ip_local_port_range variable consists of two integers which tells the
+kernel which ports to use for client connections. This means, all connections
+going from our box to some other box and where we are the client. The first
+port is the lower bound and the second one is the upper bound.
+   </para>
+
+   <para>
+The default value in this variable depends on how much memory you have. If you
+have more than 128 megabytes of physical memory, the lower bound will be 32768
+and the upper bound will be 61000. If the computer has less than 128 megabytes
+of physical memory, the lower bound will be 1024 and the upper bound will be
+4999, or even less.
+   </para>
+
+   <para>
+This number defines the possible active connections which this system can
+issue
+simultaneously (ie, at the same time) to other systems that does not support
+the TCP extension timestamps.
+   </para>
+
+   <para>
+If you have tcp_tw_recycle enabled (the default behaviour) range 1024-4999 is
+enough to issue up to 2000 connections per second to systems supporting
+timestamps. In other words, this should be more than enough for most of us.
+   </para>
+  </section>
+
+  <section>
+   <title>ip_no_pmtu_disc</title>
+
+   <para>
+The ip_no_pmtu_disc disables PMTU (Path Maximum Transfer Unit) discovery if
+enabled. In most cases this is good, so it is per default set to FALSE (ie,
+Path Maximum Transfer Unit is used). However, in some cases this is bad and
+may lead to broken connectivity. If you are experiencing problems like this,
+you should turn this option off and set your MTU to a reasonable value
+yourself.
+   </para>
+
+   <para>
+Do note that MTU and PMTU are two different things. MTU tells the kernel the
+maximum transfer unit for our connection, but not over the whole connection
+to the other end. PMTU discovery tries to discover the maximum transfer unit
+to specific hosts, including all the intermediate hops on the way there.
+   </para>
+
+   <para>
+The default value is that the ip_no_pmtu_disc is FALSE, as already stated. If
+this is set to TRUE, PMTU discovery is turned off. The ip_no_pmtu_disc takes
+a boolean value, in other words either an 1 or a 0, where 1 is on and 0 is
+off.
+   </para>
+  </section>
+
+  <section>
+   <title>ip_nonlocal_bind</title>
+
+   <para>
+The ip_nonlocal_bind variable allows us to set if local processes should be
+able to bind to non-local IP addresses. This could be quite useful, in such
+cases where we want specific programs or applications to be able to listen to
+non-local IP adresses, such as sniffing for traffic to a specific host
+which may commit bad things, etcetera. The variable may, however,
+break some applications and they will no longer work.
+   </para>
+
+   <para>
+The ip_nonlocal_bind variable takes a boolean value which can be set to 1 or
+0. If the variable is set to 0, this option is turned off and if it is set to
+1 it is turned on. The default value is to turn this option off, or 0 in other
+words.
+   </para>
+  </section>
+
+  <section>
+   <title>ipfrag_high_thresh</title>
+
+   <para> The ipfrag_high_thresh tells the kernel the maximum amount of
+memory to use to reassemble IP fragments. When and if the high threshold
+is reached, the fragment handler will toss all packets until the memory
+usage reaches ipfrag_low_thresh instead. This means that all fragments
+that reached us during this time will have to be retransmitted.
+   </para>
+
+   <para>
+Packets are fragmented if they are too large to pass through a certain
+pipe. If they are to large, the box that is trying to transmit them breaks
+them down into smaller pieces and send each piece one by one. When these
+fragments reaches their destination, they need to be defragmented (ie, put
+together again) to be read properly. Note that IP Fragmentation are in
+general a good thing, but there are a lot of people that do bad things
+with them since fragments are inherently a security problem.
+   </para>
+
+   <para>
+The ipfrag_high_thresh variable takes an integer value, which would mean 0
+through 2147483647 bytes can be assigned to be the upper limit of this
+function. The default value is 262144 bytes, or 256 kilobytes, which 
+should work well in even the most extreme cases. 
+   </para>
+  </section>
+
+  <section>
+   <title>ipfrag_low_thresh</title>
+
+   <para>
+This option has a lot to do with the ipfrag_high_thresh option. The
+ipfrag_low_thresh is the lower limit at which packets should start being
+assembled again. What this means, all in all, is that our fragmentation
+handler has an queue that grows larger the more packets are waiting in the
+queue to be defragmentized, when this queue grows to ipfrag_high_thresh byte
+size, the fragmentation handler queue will stop queueing any further fragments
+until we reach the ipfrag_low_thresh again. This stops our system from being
+overloaded with fragmentized packets and may stop certain Denial of Service
+attacks.
+   </para>
+
+   <para> This variable takes an integer value between 0 and 2147483647,
+and refers to the amount of bytes used at which the fragmentation handler
+should resume the receiving of IP fragments again. Per default it is set
+to 196608 bytes, or 192 kilobytes which should be a reasonable amount of
+memory set aside for this task even in the hardest of attacks. This value
+should be lower than ipfrag_high_thresh, or else it will be invalid.
+   </para>
+  </section>
+
+  <section>
+   <title>ipfrag_time</title>
+
+   <para>
+The ipfrag_time variable tells the IP fragmentation handler how long to keep
+an IP fragment in memory, counted in seconds. This only refers to fragments
+that has been impossible to reassemble since fragments that has been assembled
+most probably has already been sent on to either the next layer, or to the
+next host.
+   </para>
+
+   <para>
+The ipfrag_time variable takes an integer as its input and the value is
+counted as seconds. In other words, if you input 5 to this variable, it counts
+as 5 seconds.
+   </para>
+  </section>
+ </section>
+
+ <section id="inetpeerstorage">
+  <title id="inetpeerstorage.title">Inet peer storage</title>
+
+  <para>
+The inet peer storage contains information pertaining to specific peers, or
+nodes on the Internet. However, it only contains information with a long life
+expectancy, and information that is not dependant upon routes. For the moment,
+this means that it only contains information about the ID field for the next
+outgoing packet. There are a few variables that changes the behaviour of the 
+inet peer storage today, mainly how often garbage collecting is done, as well 
+as how long time to live each peer has in the storage.
+  </para>
+
+  <section>
+   <title>inet_peer_gc_maxtime</title>
+
+   <para>
+The <filename>inet_peer_gc_maxtime</filename> variable tells the garbage
+collector how often to pass over the inet peer storage memory pool during low,
+or absent, memory pressure. This value is in effect under the reversed
+conditions of the inet_peer_gc_mintime in other words. It works exactly the
+same as the inet_peer_gc_mintime, except for the fact that it will be in
+effect under different system loads. This variable is also measured in
+jiffies, which is explained closer in appendix A.
+   </para>
+
+   <para>
+The inet_peer_gc_maxtime variable takes an integer value and has a default
+value of 120 jiffies. 120 jiffies should be a good value for most workstations
+and servers.
+   </para>
+  </section>
+
+  <section>
+   <title>inet_peer_gc_mintime</title>
+
+   <para>
+The inet_peer_gc_mintime variable sets the minimum time between garbage
+collections (gc) passes in the inet peer storage under heavy memory pressure.
+If the system is under heavy utilization and there is a lot of constraints on
+the memory pool, this timer is used to tell the garbage collector how often to
+pass over the memory pool used by the inet peer storage, in jiffies. For a
+complete explanation of jiffies, see appendix A.
+   </para>
+
+   <para>
+The inet_peer_gc_mintime variable takes an integer value and has a default
+value of 10 jiffies. This should be a fairly good value for most users and
+servers.
+   </para>
+  </section>
+
+  <section>
+   <title>inet_peer_maxttl</title>
+
+   <para>
+This is the maximum time to live for the inet peer entries. Unused entries
+will expire after this period of time if there is no memory pressure on the
+pool. This would in other words mean when the number of entries in the pool is
+very small, and likely situations.
+   </para>
+
+   <para>
+The inet_peer_maxttl variable takes an integer value, and is measured in
+jiffies. For a complete explanation of jiffies, see appendix A.
+   </para>
+  </section>
+
+  <section>
+   <title>inet_peer_minttl</title>
+
+   <para>
+This is the minimum time to live for inet peer entries. This should be set to
+an high enough value to cover fragment time to live in the reassembling side
+of fragmented packets. The minimum time to live is guaranteed if the pool size
+is less than inet_peer_threshold.
+   </para>
+
+   <para>
+The inet_peer_minttl variable takes an integer value, and is measured in
+jiffies. For a complete explanation of jiffies, see appendix A.
+   </para>
+  </section>
+
+  <section>
+   <title>inet_peer_threshold</title>
+
+   <para>
+The inet_peer_threshold variable tells the approximate size of the inet peer
+storage. When this limit is reached, peer entries will be thrown away
+agressively, using the inet_peer_gc_mintime timeout. This threshold will also
+determine how long an entry may "live" in the peer storage, in other word it
+is one of the parts which decides the entries time to live. To put it simple,
+the higher this value is, the longer the time to live within your system.
+   </para>
+
+   <para>
+This variable takes an integer and defaults to the value 65664 bytes.
+   </para>
+  </section>
+ </section>
+
+ <section id="tcpvariables">
+  <title id="tcpvariables.title">TCP Variables</title>
+
+  <para>
+This section will take a brief look at the variables that changes the
+behaviour of the TCP variables. These variables are normally set to a pretty
+good value per default and most of them should never ever be touched, except
+when asked by authoritative developers! They are mainly described here, only
+for those who are curious about their basic meaning.
+  </para>
+
+  <section>
+   <title>tcp_abort_on_overflow</title>
+
+   <para>
+The tcp_abort_on_overflow variable tells the kernel to reset new connections
+if the system is currently overflowed with new connection attempts that the
+daemon(s) can not handle. What this means, is that if the system is overflowed
+with 1000 large requests in a burst, connections may be reset since we can not
+handle them if this variable is turned on. If it is not set, the system will
+try to recover and handle all requests.
+   </para>
+
+   <para>
+This variable takes an boolean value (ie, 1 or 0) and is per default set to 0
+or FALSE. Avoid enabling this option except as a last resort since it most
+definitely harm your clients. Before considering using this variable you
+should try to tune up your daemons to accept connections faster.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_adv_win_scale</title>
+
+   <para>
+This variable is used to tell the kernel how much of the socket buffer space
+should be used for TCP window size, and how much to save for an application
+buffer. If tcp_adv_win_scale is negative, the following equation is
+used to calculate the buffer overhead for window scaling:
+   </para>
+
+   <informalequation>
+    <alt>bytes-(bytes/2^(-tcp_adv_win_scale))</alt>
+    <graphic fileref="images/adv-window-scale-neg-eq"></graphic>
+   </informalequation>
+
+   <para>
+Where bytes are the amount of bytes in the window. If the
+tcp_adv_win_scale value is positive, the following equation is used to
+calculate the buffer overhead:
+   </para>
+
+   <informalequation>
+    <alt>bytes/2^tcp_adv_win_scale</alt>
+    <graphic fileref="images/adv-window-scale-pos-eq"></graphic>
+   </informalequation>
+
+   <para>
+The tcp_adv_win_scale variable takes an integer value and is per default
+set to 2. This in turn means that the application buffer is 1/4th of the total
+buffer space specified in the tcp_rmem variable.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_app_win</title>
+
+   <para>
+This variable tells the kernel how many bytes to reserve for a specific
+TCP window in the TCP sockets memory buffer where the specific TCP window
+is transfered in. This value is used in a calculation that specifies how
+much of the buffer space to reserve that looks as the following:
+   </para>
+
+   <informalequation>
+    <alt>window/2^tcp_app_win</alt>
+    <graphic fileref="images/app-window-eq"></graphic>
+   </informalequation>
+
+   <para>
+As you may understand from the above calculation, the larger this value
+gets, the smaller will the buffer space be for the specific window. The
+only exception to this calculation is 0, which tells the kernel to reserve
+no space for this specific connection. The default value for this variable
+is 31 and should in general be a good value. Do not change this value
+unless you know what you are doing.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_dsack</title>
+
+   <para>
+This option is required to send duplicate SACKs which was briefly described in
+the tcp_sack variable explanation. This is described in detail within the RFC
+2883. This RFC document explains in detail how to handle situations where a
+packet is received twice or out of order. D-SACK is an extension to standard
+SACK and is used to tell the sender when a packet was received twice (ie, it
+was duplicated). The D-SACK data can then be used by the transmitter to
+improve network settings and so on. This should be 100% backwards compatible
+with older implementations as long as the previous implementors have not tried
+to implement this into the old SACK option in their own fashion. This is
+extremely rare and should not be a problem for anyone.
+   </para>
+
+   <para>
+The tcp_dsack variable uses a boolean value and is per default set to 1, or
+turned on. Of course, this behaviour is <emphasis>only</emphasis> used if
+tcp_sack is turned on since tcp_dsack is heavily dependant upon tcp_sack. In
+almost all cases this should be a good idea to have turned on.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_ecn</title>
+
+   <para>
+The tcp_ecn variable turns on Explicit Congestion Notification in TCP
+connections. This is used to automatically tell the host when there are
+congestions in a route to a specific host or a network. This can be used to
+throttle the transmitters to send packets in a slower rate over that specific
+router or firewall. Explicit Congestion Notification (ECN) is explained in
+detail in the <link linkend="rfc3168" endterm="rfc3168.title"></link> 
+document and there is also a performance evaluation of the addition of ECN
+available in the <link linkend="rfc2884" endterm="rfc2884.title"></link> 
+document.
+
+   </para>
+
+   <para>
+Briefly, this document details how we could notify other hosts when we are
+congested or not, which in turn will make us able to choose other routes in
+preference over the currently used route, or to simply send less data until we
+no longer receive congestion messages.
+   </para>
+
+   <caution>
+    <para>
+There are still some old firewalls and routers out on the Internet that will
+filter away all IP packets that has the ECN bits set. They are fairly uncommon
+these days, but if you are unlucky, you may run into them. If you do
+experience connection problems to specific hosts, try turning ECN off and see
+how things go. If you find the actual host blocking the ECN packets, try
+getting in touch with the administrators and warn them about this. A deeper
+explanation of the problem, as well as a list of the most common hardware that
+causes this trouble is available, and can be found in the <link
+linkend="otherresources" endterm="otherresources.title"></link> appendix,
+under the <link linkend="ecnunderlinux" endterm="ecnunderlinux.title"></link>
+heading.
+    </para>
+   </caution>
+
+   <para>
+The tcp_ecn variable takes a boolean value and is per default set to 0, or
+turned off. If you want to turn this on in your kernel, you should set this
+variable to 1.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_fack</title>
+
+   <para> The tcp_fack variable enables the Forward Acknowledgement system
+in Linux. Forward Acknowledgement is a special algorithm that works on top
+of the SACK options, and is geared at congestion controlling.
+   </para>
+
+   <para> The main idea of FACK algorithm is to consider the most forward
+selective acknowledgement sequence number as a sign that all the previous
+un(selectively) acknowledged segments were lost. This observation allows
+to improve recovery of losses singificantly. This assumption breaks in
+presence of packet reordering, in which case the FACK algorithm is
+automatically turned off for that specific connection.
+   </para>
+
+   <para> This algorithm was originally created by Matthew Mathis and
+co-authors.  You can find the papers describing the algorithm more closely
+over at <ulink
+url="http://www.psc.edu/~mathis/">http://www.psc.edu/~mathis/</ulink>.
+   </para>
+
+   <para> The tcp_fack variable takes a boolean value, and is per default
+set to 1, or turned on. This behaviour is not used if tcp_sack is turned
+off since it is heavily dependant upon tcp_sack.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_fin_timeout</title>
+
+   <para>
+The tcp_fin_timeout variable tells kernel how long to keep sockets in the
+state FIN-WAIT-2 if you were the one closing the socket. This is used if the
+other peer is broken for some reason and don't close its side, or the other
+peer may even crash unexpectedly. Each socket left in memory takes
+approximately 1.5Kb of memory, and hence this may eat a lot of memory if you
+have a moderate webserver or something alike.
+   </para>
+
+   <para>
+This value takes an integer value which is per default set to 60 seconds.
+This used to be 180 seconds in 2.2 kernels, but was reduced due to the
+problems mentioned above with webservers and problems that arose from getting
+huge amounts of connections.
+   </para>
+
+   <para>
+Also see the tcp_max_orphans and tcp_orphan_retries variables for more
+information.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_keepalive_intvl</title>
+
+   <para>
+The tcp_keepalive_intvl variable tells the kernel how long to wait for a
+reply on each keepalive probe. This value is in other words extremely
+important when you try to calculate how long time will go before your
+connection will die a keepalive death.
+   </para>
+
+   <para>
+The variable takes an integer value and the default value is 75 seconds. This
+is in the higher regions and should be concidered the higher threshold on what
+values should be concidered normal to use. The default values of the
+tcp_keepalive_probes and tcp_keepalive_intvl can be used to get the default
+time it will take before the connection is timed out because of keepalive.
+   </para>
+
+   <para>
+With the default values of sending 9 probes with 75 seconds for each, it
+would take approximately 11 minutes before the connection is timed out,
+counting from when we start the probing which in turn will happen 2 hours
+from the time we last saw any traffic on the connection.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_keepalive_probes</title>
+
+   <para>
+The tcp_keepalive_probes variable tells the kernel how many TCP keepalive
+probes to send out before it decides a specific connection is broken.
+   </para>
+
+   <para>
+This variable takes an integer value, which should generally not be set
+higher than 50 depending on your tcp_keepalive_time value and the
+tcp_keepalive_interval. The default value is to send out 9 probes before
+telling the application that the connection is broken.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_keepalive_time</title>
+
+   <para>
+The tcp_keepalive_time variable tells the TCP/IP stack how often to send TCP
+keepalive packets to keep an connection alive if it is currently unused. This
+value is only used when keepalive is enabled.
+   </para>
+
+   <para>
+The tcp_keepalive_time variable takes an integer value which is counted in
+seconds. The default value is 7200 seconds, or 2 hours. This should be a good
+value for most hosts and will not take too much network resources from you.
+Do not set this value to low since it will then use up your network resources
+with unnecessary traffic.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_max_orphans</title>
+
+   <para>
+The tcp_max_orphans variable tells the kernel how many TCP sockets that are
+not attached to any user file handle to maintain. In case this number is
+exceeded, orphaned connections are immediately reset and a warning is printed.
+   </para>
+
+   <para>
+The only reason for this limit to exist is to prevent some simple DoS attacks.
+Generally you should not rely on this limit, nor should you lower it
+artificially. If need be, you should instead increase this limit if your
+network environment requires such an update. Increasing this limit may require
+that you get more memory installed to your system. If you hit this limit, you
+may also tune your network services a little bit to linger and kill sockets in
+this state more aggressively.
+   </para>
+
+   <para>
+This variable takes an integer value and is per default set to 8192, but
+heavily depends upon how much memory you have. Each orphan that currently
+lives eats up 64Kb of unswappable memory, which means that one hell of a lot
+of data will be used up if problems arise.
+   </para>
+
+   <note>
+    <para>
+If you run into this limit, you will get an error message via the syslog
+facility kern.info that looks something like this:
+    </para>
+
+    <para>
+<computeroutput>TCP: too many of orphaned sockets</computeroutput>
+    </para>
+
+    <para>
+If this shows up, either upgrade the box in question or look closer at the
+tcp_fin_timeout or tcp_orphans_retries which should give you some help with
+getting rid of huge amounts of orphaned sockets.
+    </para>
+   </note>
+  </section>
+
+  <section>
+   <title>tcp_max_syn_backlog</title>
+
+   <para>
+The tcp_max_syn_backlog variable tells your box how many SYN requests to keep
+in memory that we have yet to get the third packet in a 3-way handshake from.
+The tcp_max_syn_backlog variable is overridden by the tcp_syncookies variable,
+which needs to be turned on for this variable to have any effect. If the
+server suffers from overloads at peak times, you may want to increase this
+value a little bit.
+   </para>
+
+   <para>
+This variable takes an integer value and is per default set to different
+values depending on how much memory you have. If you have less than 128 Mb of
+RAM, it is set to a maximum of 128 SYN backlog requests. If you have more than
+128 Mb of RAM, it is set to 1024 SYN backlog requests.
+   </para>
+
+   <caution>
+    <para>
+If this value is raised to a larger value than 1024 it would most probably be
+better to change the TCP_SYNQ_HSIZE value and recompile your kernel. The
+TCP_SYNQ_HSIZE variable is set in linux/include/tcp.h. This value should be
+set so to keep this formula true:
+    </para>
+
+    <para>
+TCP_SYNQ_HSIZE*16&lt;=tcp_max_syn_backlog
+    </para>
+
+    <para>
+In other words, TCP_SYNQ_HSIZE times 16 should be smaller than or equal to
+tcp_max_syn_backlog.
+    </para>
+   </caution>
+  </section>
+
+  <section>
+   <title>tcp_max_tw_buckets</title>
+
+   <para>
+The tcp_max_tw_buckets variable tells the system the maximum number of sockets
+in TIME-WAIT to be held simultaneously. If this number is exceeded, the
+exceeding sockets are destroyed and a warning message is printed to you. The
+reason for this limit to exist is to get rid of really simple DoS attacks.
+   </para>
+
+   <para>
+The tcp_max_tw_buckets variable takes an integer value which tells the system
+at which point to start destroying timewait sockets. The default value is set
+to 180000. This may sound much, but it is not. If anything, you should
+possibly need to increase this value if you start receiving errors due to this
+setting.
+   </para>
+
+   <caution>
+    <para>
+You should not lower this limit artificially. If you start receiving
+errors indicating this problem in normal operation, you should instead
+increase this value if your network requires so. This may lead to the
+requirement of more memory installed in the machine in question.
+    </para>
+   </caution>
+  </section>
+
+  <section>
+   <title>tcp_mem</title>
+
+   <para>
+   The tcp_mem variable defines how the TCP stack should behave when it
+comes to memory usage. It consists of three values, just as the tcp_wmem
+and tcp_rmem variables. The values are measured in memory pages (in short,
+pages). The size of each memory page differs depending on hardware and
+configuration options in the kernel, but on standard i386 computers, this
+is 4 kilobyte or 4096 bytes. On some newer hardware, this is set to 16, 32
+or even 64 kilobytes. All of these values have no real default value since
+it is calculated at boottime by the kernel, and should in most cases be
+good for you and most usages you may encounter.
+
+   </para>
+
+   <para>
+   The first value specified in the tcp_mem variable tells the kernel the
+low threshold. Below this point, the TCP stack do not bother at all about
+putting any pressure on the memory usage by different TCP sockets.
+   </para>
+
+   <para>
+   The second value tells the kernel at which point to start pressuring
+memory usage down. This so called memory pressure mode is continued until
+the memory usage enters the lower threshold again, and at which point it
+enters the default behaviour of the low threshold again. The memory
+pressure mode presses down the TCP receive and send buffers for all the
+sockets as much as possible, until the low mark is reached again.
+   </para>
+
+   <para>
+The final value tells the kernel how many memory pages it may use
+maximally. If this value is reached, TCP streams and packets start getting
+dropped until we reach a lower memory usage again. This value includes all
+TCP sockets currently in use.
+   </para>
+
+   <tip>
+    <para>
+This variable may give tremenduous increase in throughput on high bandwidth
+networks, if used properly together with the tcp_rmem and tcp_wmem variable.
+The tcp_rmem variable doesn't need too much manual tuning however, since the
+Linux 2.4 kernels has very good autotuning handlings on this aspect, but the
+other two may be worth looking at. For more information about this, look at
+the <link linkend="tcptuningguide" endterm="tcptuningguide.title"></link>.
+    </para>
+   </tip>
+
+  </section>
+
+  <section>
+   <title>tcp_orphan_retries</title>
+
+   <para>
+The tcp_orphan_retries variable tells the TCP/IP stack how many times to
+retry to kill connections on the other side before killing it on our own side.
+If your machine runs as a highly loaded http server it may be worth thinking
+about lowering this value. http sockets will consume large amounts of
+resources if not checked.
+   </para>
+
+   <para>
+This variable takes an integer value. The default value for this variable is
+7, which would approximately correspond to 50 seconds through 16 minutes
+depending on the Retransmission Timeout (RTO). For a complete explanation of
+the RTO, read the "3.7. Data Communication" section in RFC 793 - Transmission
+Control Protocol.
+   </para>
+
+   <para>
+Also see the tcp_max_orphans variable for more information.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_reordering</title>
+
+   <para>
+The tcp_reordering variable tells the kernel how much a TCP packet may be 
+reordered in a stream without assuming that the packet was lost
+somewhere on the way. If the packet is assumed lost, the TCP stack will
+automatically go back into a slow start since it believes packets may have
+been lost due to congestion somewhere. The TCP stack will also fall back 
+from using the FACK algorithm for this specific host in the future.
+   </para>
+
+   <para>
+This variable takes an integer variable and is per default set to 3. This
+should in general be a good value and you should not touch it. If this
+value is lowered, it may result in bad network performance, especially if
+packets often get reordered in connections.
+   </para>
+
+   <note>
+    <para>
+This variable is overridden by the <command>reordering</command> option in 
+the <command>ip route</command> command starting with kernels 2.3.15 and 
+higher. If <command>reordering</command> is not given to the <command>ip 
+route</command> command, the default is taken from the sysctl 
+tcp_reordering.
+    </para>
+   </note>
+  </section>
+
+  <section>
+   <title>tcp_retrans_collapse</title>
+
+   <para>
+This variable implements a bug in the TCP protocol so it will be able to talk
+to certain other buggy TCP stacks. Without implementing this bug in the TCP
+stack, we would be unable to talk to certain printers that has this bug built
+in. This bug makes the TCP stack try to send bigger packets on retransmission
+of packets to work around bugs in those printers and other hardware
+implementations.
+   </para>
+
+   <para>
+This variable takes a boolean value and is normally set to 1, or on.
+Implementing this bug workaround will not break compatibility from our host to
+others, but it will make it possible to speak to those printers. In general,
+it should not be a dangerous workaround, but you may turn it off if you
+receive weird error messages.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_retries1</title>
+
+   <para>
+The tcp_retries1 variable tells the kernel how many times it should retry to
+get to a host before reaching a decision that something is wrong and that it
+should report the suspected problem to the network layer. The minimal value
+here specified by RFC ???? is 3, which is also the default. This corresponds
+to 3 seconds through 8 minutes depending on your Retransmission timeout (RTO).
+For a good explanation of the Retransmission timeout, read the "3.7. Data
+Communication" section in RFC 793 - Transmission Control Protocol.
+   </para>
+
+   <para>
+This variable takes an integer, which is per default set to 3 as explained
+above. The lower limit is 3 if you want to follow standards, and the upper
+bound should be lower than 100 or so since timeouts could be worse than
+horrible if this high.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_retries2</title>
+
+   <para>
+The tcp_retries2 value tells the kernel how many times to retry before
+killing an alive TCP connection. This limit is specified to a minimum of 100
+seconds in RFC 1122, but is normally way to short.
+   </para>
+
+   <para>
+The variable takes an integer value and is set to 15 per default. This value
+corresponds to 13-30 minutes depending on the Retransmission timeout (RTO).
+Generally this should be a good timeout, you may bring it down but not
+necessarily.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_rfc1337</title>
+
+   <para> The tcp_rfc1337 variable implements the solution found in <link
+linkend="rfc1337" endterm="rfc1337.title"></link> to TIME-WAIT
+Assassination. In short, the problem is that old duplicate packets may
+interfer with new connections, and lead to three different problems. The
+first one is that old duplicate data may be accepted erroneously in new
+connections, leading to the sent data becoming corrupt. The second problem
+is that connections may become desynchronized and get into an ACK loop
+because of old duplicate packets entering new connections, which will
+become desynchronized. The third and last problem is that old duplicate
+packets may enter newly established connections erroneously and kill the
+new connection.
+   </para>
+
+   <para>
+There are three possible solutions to this according to the mentioned RFC,
+however, one solution is only partial and not a long term solution, while
+the last requires heavy modifications of the TCP protocol, and is hence
+not a viable option.
+   </para>
+
+   <para>
+The final solution that the linux kernel implements with this option, is
+to simply ignore RST packets sent to a socket while it is in the TIME-WAIT
+state. In use together with 2 minute Maximum Segment Life (MSL), this
+should eliminate all three problems discussed in RFC 1337.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_rmem</title>
+
+   <para>
+   The tcp_rmem variable is pretty much the same as the tcp_wmem, except
+in one large area. It tells the kernel the TCP receive memory buffers
+instead of the transmit buffer which is defined in tcp_wmem. This variable
+takes 3 different values, just the same as the tcp_wmem variable.
+   </para>
+
+   <para>
+   The first value tells the kernel the minimum receive buffer for each
+TCP connection, and this buffer is always allocated to a TCP socket, even
+under high pressure on the system. This value is set to 4096 bytes, or 4
+kilobytes, in newer kernels, but was in previous kernels set to 8192 bytes
+or 8 kilobytes. This should generally be a good value, and you should
+avoid raising this value if you are sporadically experiencing large bursts
+and high network loads since the system may get into even worse problems
+then.
+   </para>
+
+   <para>
+   The second value specified tells the kernel the default receive buffer
+allocated for each TCP socket. This value overrides the
+/proc/sys/net/core/rmem_default value used by other protocols. The default
+value here is 87380 bytes, or 85 kilobytes. This value is used together
+with tcp_adv_win_scale and tcp_app_win to calculate the TCP window size,
+which is discussed within the explanations of those variables. This value
+should under normal circumstances not be touched either since it may
+result in similar problems as with the first value in this variable.
+   </para>
+
+   <tip>
+    <para>
+This variable may give tremenduous increase in throughput on high bandwidth
+networks, if used properly together with the tcp_mem and tcp_wmem variable.
+The tcp_rmem variable doesn't need too much manual tuning however, since the
+Linux 2.4 kernels has very good autotuning handlings on this aspect, but the
+other two may be worth looking at. For more information about this, look at
+the <link linkend="tcptuningguide" endterm="tcptuningguide.title"></link>.
+    </para>
+   </tip>
+
+   <para>
+   The third and last value specified in this variable specifies the
+maximum receive buffer that can be allocated for a TCP socket. This value
+is overridden by the /proc/sys/net/core/rmem_max if the ipv4 value is
+larger than the core value. You need to look at the core value before you
+do any changes to the ipv4 value in other words. The default value here is
+a double up of the second value specified. In other words, 87380 * 2
+bytes, or 174760 bytes (170 kilobytes). Generally this should be a good
+value and should not need to be changed.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_sack</title>
+
+   <para> The tcp_sack variable enables Selective Acknowledgements (SACK)
+as they are defined in <link linkend="rfc2883"
+endterm="rfc2883.title"></link> and <link linkend="rfc2883"
+endterm="rfc2883.title"></link>. These RFC documents contain information
+on an TCP option that was especially developed to handle lossy
+connections.
+   </para>
+
+   <para>
+If this variable is turned on, our host will set the SACK option in the TCP
+option field in the TCP header when it sends out a SYN packet. This tells the
+server we are connecting to that we are able to handle SACK. In the future, if
+the server knows how to handle SACK, it will then send ACK packets with the
+SACK option turned on. This option selectively acknowledges each segment in a
+TCP window. This is especially good on very lossy connections (connections
+that loose a lot of data in the transfer) since this makes it possible to only
+retransmit specific parts of the TCP window which lost data and not the whole
+TCP window as the old standards told us to do. This means that if a certain
+segment of a TCP window is not received, the receiver will not return a SACK
+for that segment. The sender will then know which packets where not received
+by the receiver, and will hence retransmit that packet. For redundancy, this
+option will fill up all space possibly within the option space, 40 bytes per
+segment. Each SACK'ed packet takes up 2 32-bit unsigned integers and hence the
+option space can contain 4 SACK'ed segments. However, normally the timestamp
+option is used in conjunction with this option. The timestamp option takes up
+10 bytes of data, and hence only 3 segments may be SACK'ed in each packet in
+normal operation.
+   </para>
+
+   <para>
+If you know that you will be sending data over an extremely lossy connection
+such as a bad internet connection at one point or another, this variable is
+recommended to turn on. However, if you will only send data over an internal
+network consisting of a perfect condition 2 feet cat-5 cable and both machines
+being able to keep up with maximum speed without any problems, you should not
+need it. This option is not required, but it is definitely a good idea to have
+it turned on. Note that the SACK option is 100% backwards compatible, so you
+should not run into any problems talking to any other hosts on the internet
+who do not support it.
+   </para>
+
+   <para>
+The tcp_sack option takes a boolean value. This is per default set to 1, or
+turned on. This is generally a good idea and should cause no problems.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_stdurg</title>
+
+   <para> This variable enables or disables RFC 1122 compliance. The
+default behaviour is to be BSD 4.2 compliant, which follows the RFC 793
+explanation of the URG flag. If this variable is turned on, we may be
+unable to communicate properly with certain hosts on the internet, or more
+specifically, those hosts on the internet that are BSD 4.2 compliant. For
+more information on the changes, read the <link linkend="rfc1122"
+endterm="rfc1122.title"></link> under the section "4.2.2.4 Urgent Pointer:
+RFC 793 Section 3.1 explanation" which refers back to <link
+linkend="rfc793" endterm="rfc793.title"></link> as can be seen in the name
+of the section mentioned.
+   </para>
+
+   <para>
+The tcp_stdurg variable takes a boolean value and is per default set to 0, or
+FALSE. If this is turned on, your box may be unable to talk to certain hosts
+as described above.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_syn_retries</title>
+
+   <para>
+The tcp_syn_retries variable tells the kernel how many times to try to
+retransmit the initial SYN packet for an active TCP connection attempt.
+   </para>
+
+   <para>
+This variable takes an integer value, but should not be set higher than 255
+since each retransmission will consume huge amounts of time as well as some
+amounts of bandwidth. Each connection retransmission takes aproximately 30-40
+seconds. The default setting is 5, which would lead to an aproximate of 180
+seconds delay before the connection times out.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_synack_retries</title>
+
+   <para>
+The tcp_synack_retries setting tells the kernel how many times to retransmit
+the SYN,ACK reply to an SYN request. In other words, this tells the system
+how many times to try to establish a passive TCP connection that was started
+by another host.
+   </para>
+
+   <para>
+This variable takes an integer value, but should under no circumstances be
+larger than 255 for the same reasons as for the tcp_syn_retries variable.
+Each retransmission will take aproximately 30-40 seconds. The default value
+of the tcp_synack_retries variable is 5, and hence the default timeout of
+passive TCP connections is aproximately 180 seconds.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_syncookies</title>
+
+   <para>
+The tcp_syncookies variable is used to send out so called syncookies to hosts
+when the kernels syn backlog queue for a specific socket is overflowed. This
+means that if our host is flooded with several SYN packets from different
+hosts, the syn backlog queue may overflow, and hence this function starts
+sending out cookies to see if the SYN packets are really legit.
+   </para>
+
+   <para>
+This variable is used to prevent an extremely common attack that is called
+a "syn flood attack". The tcp_syncookies variable takes an boolean
+value which can either be set to 0 or 1, where 0 means off. The default
+setting is to turn this function off.
+   </para>
+
+   <caution>
+    <para>
+There has been a lot of discussions about the problems and flaws with 
+syncookies in the past. Personally, I choose to look on SYN cookies as 
+something fairly usefull, and since it is not causing any strangeness under 
+normal operation, it should not be very dangerous. However, it may be dangerous,
+and you may want to see below.
+    </para>
+
+    <para>
+The tcp_syncookies option means that under high load the system
+will make new connections without advanced features like ECN or SACK being
+used. If syncookies are being triggered during normal load rather than an
+attack you should tune the tcp queue length and the servers handling the
+load.
+    </para>
+
+    <para>
+You must not use this facility to help a highly loaded server to stand 
+down from legal connections. If you start to see syn flood warnings in your 
+logs, and they show out to be legit connections, you may tune the 
+tcp_max_syn_backlog, tcp_synack_retries and tcp_abort_on_overflow variables.
+    </para>
+   </caution>
+  </section>
+
+  <section>
+   <title>tcp_timestamps</title>
+
+   <para>
+The tcp_timestamps variable tells the kernel to use timestamps as defined in
+RFC 1323. In short, this is an TCP option that can be used to calculate the
+Round Trip Measurement in a better way than the retransmission timeout method
+can. This should be backwards compatible in almost all circumstances so you
+could very well turn this on if your host lives on a high speed network. If
+you only use up to an 10mbps connection of some sort(LAN or Internet or
+anything for that matter), you should manage fairly well without this option,
+and at really low speeds, you may even be better off with this variable turned
+off.
+   </para>
+
+   <para>
+This variable takes a boolean value and is per default set to 1, or enabled.
+Generally this should be a good idea to have turned on. The only exception
+would be if you live on an extremely slow connection such as a 56 kbps modem
+connection to the Internet.
+   </para>
+
+   <para> For more technical information about this option read section 4
+of the <link linkend="rfc1323" endterm="rfc1323.title"></link>. This
+document discusses the technical and theoretical introduction of these
+options and how it should work.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_tw_recycle</title>
+
+   <para>
+This variable enables the fast recycling function of TIME-WAIT sockets. Unless
+you know what you are doing you should not touch this function at all.
+   </para>
+
+   <para>
+The tcp_tw_recycle variable takes an integer value and the default value is 0
+from my experience and my understanding of the source code of linux. In other
+words, the statement in the linux/Documentation/ip-sysctl.txt file is wrong
+unless I am mistaken.
+   </para>
+
+   <caution>
+    <para>
+Do not reset this from its default value unless you know what you are
+doing and/or have gotten the advice or request from an technical expert or
+kernel coder.
+    </para>
+   </caution>
+  </section>
+
+  <section>
+   <title>tcp_window_scaling</title>
+
+   <para>
+The tcp_window_scaling variable enables window scaling as it is defined in
+RFC 1323. This RFC specifies how we can scale TCP windows if we are sending
+them over Large Fat Pipes (LFP). When sending TCP packets over these large
+pipes, we experience heavy bandwidth loss due to the channels not being fully
+filled while waiting for ACK's for our previous TCP windows. The main problem
+is that a TCP Window can not be larger than 2**16 bytes, or 65Kb large.
+Enabling tcp_window_scaling enables a special TCP option which makes it
+possible to scale these windows to a larger size, and hence reduces bandwidth
+losses due to not utilizing the whole connection.
+   </para>
+
+   <para>
+This variable takes a boolean value and is per default set to 1, or true. If
+you want to turn this off, set it to 0.
+   </para>
+
+   <para>
+For more information about TCP window scaling, read the <link
+linkend="rfc1323" endterm="rfc1323.title"></link>.
+   </para>
+  </section>
+
+  <section>
+   <title>tcp_wmem</title>
+
+   <para>
+This variable takes 3 different values which holds information on how
+much TCP sendbuffer memory space each TCP socket has to use. Every TCP
+socket has this much buffer space to use before the buffer is filled up.
+Each of the three values are used under different conditions.
+   </para>
+
+   <para>
+The first value in this variable tells the minimum TCP send buffer space
+available for a single TCP socket. This space is always allocated for a
+specific TCP socket opened by a program as soon as it is opened. This
+value is normally set to 4096 bytes, or 4 kilobytes.
+   </para>
+
+   <para>
+The second value in the variable tells us the default buffer space
+allowed for a single TCP socket to use. If the buffer tries to grow larger
+than this, it may get hampered if the system is currently under heavy load
+and don't have a lot of memory space available. It may even have to drop
+packets if the system is so heavily loaded that it can not give more
+memory than this limit. The default value set here is 16384 bytes, or 16
+kilobytes of memory. It is not very wise to raise this value since the
+system is most probably already under heavy memory load and usage, and
+this would hence lead to even more problems for the rest of the system.
+This value overrides the /proc/sys/net/core/wmem_default value that is
+used by other protocols, and is usually set to a lower value than the core
+value.
+   </para>
+
+   <para>
+   The third value tells the kernel the maximum TCP send buffer space.
+This defines the maximum amount of memory a single TCP socket may use. Per
+default this value is set to 131072, or 128 kilobytes. This should be a
+reasonable value for most circumstances, and you will most probably never
+need to change these values. However, if you ever do need to change it,
+you should keep in mind that the /proc/sys/net/core/wmem_max value
+overrides this value, and hence this value should always be smaller than
+that value.
+   </para>
+
+   <tip>
+    <para>
+This variable may give tremenduous increase in throughput on high bandwidth
+networks, if used properly together with the tcp_mem and tcp_rmem variable.
+The tcp_wmem variable is the variable of the three which may give the most
+gain from this kind of tweaking. Do note that you will see almost no gain
+on slower networks than giga ethernet networks. For more information about
+this, look at the <link linkend="tcptuningguide"
+endterm="tcptuningguide.title"></link>.
+    </para>
+   </tip>
+
+  </section>
+ </section>
+
+ <section id="icmpvariables">
+  <title id="icmpvariables.title">ICMP Variables</title>
+
+   <para>
+These are the variables available in ipsysctl to change the behaviour for
+ICMP traffic. These are rather simple and should not pose any real problem
+to understand as some of the TCP variables may. They are generally very
+simple and mainly tell the kernel how to react on different ICMP types and
+if they are to be limited etcetera.
+   </para>
+
+   <section id="icmpechoignoreall">
+    <title id="icmpechoignoreall.title">icmp_echo_ignore_all</title>
+
+   <para>
+If this value is set to 1, in other words on or true, the kernel chooses
+to totally ignore all ICMP Echo requests. This variable takes a boolean
+value and is per default set to false, or off. If this is variable is
+turned on, you and others will be unable to ping the machine in question
+which is generally a bad thing. Of course, everyone has different opinions
+about this, some say it is good because people will be unable to ping you
+and hence know you are there, some say it is bad because you want people
+to know you are available on the internet. A lot of tools and
+applications rely upon ICMP Echo requests, some good, some bad as always.
+   </para>
+
+  </section>
+
+  <section>
+   <title>icmp_echo_ignore_broadcasts</title>
+
+   <para>
+This variable works precisely the same as icmp_echo_ignore_all except that
+it will only ignore those ICMP messages sent to broadcast or multicast
+addresses. It should be quite obvious why this is good, it would among
+other things stop this specific host from being part of smurf attacks and
+likely problems. Broadcast pings are generally bad unless you are using
+this to find out how many hosts on your network(s) are up or not.
+   </para>
+
+   <para>
+The icmp_echo_ignore_broadcasts variable takes a boolean value and is per
+default turned off. If you want to turn this value on, you should do so
+since there is relatively few bad sides to not replying to broadcast
+pings.
+   </para>
+  </section>
+
+  <section>
+   <title>icmp_ignore_bogus_error_responses</title>
+
+   <para>
+There are some routers on the internet and in other places that ignore the
+standards drawn up in RFC 1122 and sends out bogus responses to broadcast
+frames. Normally, these violations are logged via the kernel logging
+facilities, but if we do not want to see these error messages in our logs
+we may turn this variable on, which will lead to all such error messages
+being ignored totally. If you live close to such a router, you will save
+much harddrive space in not logging these messages.
+   </para>
+
+   <para>
+This variable takes a boolean value as you may understand, and is per
+default set to 0 or off. If you need or want this option and want to get
+rid of some annoying error messages in your logs, you may turn this on.
+   </para>
+  </section>
+
+  <section>
+   <title>icmp_ratelimit</title>
+
+   <para>
+icmp_ratelimit is the maximum rate at which the kernel generates icmp messages
+of the types specified by icmp_ratemask (see <link linkend="icmpratemask" 
+endterm="icmpratemask.title"></link>). The value is the
+number of jiffies the kernel has to wait between sending two such messages.
+Therefore zero means no limit. Typically 1 jiffy = 1/100 sec, so a value of 1
+means no more than 100/sec, a value of 100 means no more than 1/sec.
+   </para>
+
+   <para>
+Per default, this variable is set to 100, which means 1 ICMP packet may
+be sent in 100 jiffies. If we set it to 1, we allow 100 ICMP packets per
+second, and 0 means unlimited ICMP sendings.
+   </para>
+
+  </section>
+
+  <section id="icmpratemask">
+   <title id="icmpratemask.title">icmp_ratemask</title>
+
+   <para>
+The icmp_ratemask variable sets the mask of which ICMP types should be
+ratelimited with the icmp_ratelimit variable. The types are put together
+in the mask by setting specific bits in this variable.
+   </para>
+
+   <para>
+icmp_ratemask is the sum of 2^n for each icmp type you wish to ratelimit, and
+where n is each ICMP type as specified in the header files of the kernel. This
+ensures that each bit has a specific meaning. All of the different ICMP names
+and their corresponding values are available in the include file
+netinet/ip_icmp.h (generally
+<filename>/usr/include/netinet/ip_icmp.h</filename> on most systems). For more
+information about the different ICMP values and their meaning, see <link
+linkend="rfc792" endterm="rfc792.title"></link>. This would be the
+complete mathematical formula for the expression:
+   </para>
+
+   <informalequation>
+    <alt>ratemask = SUM 2^n</alt>
+    <graphic fileref="images/icmp_ratemask"></graphic>
+   </informalequation>
+
+   <para>For all ICMP types n to be rate limited.</para>
+
+   <para> For example, if you want to include the ICMP Destination unreachable
+type in the ratemask, we would notice that this has the value 3 in the header
+files. To do the conversion then, we would calculate 2^3, which turns out to
+be 8. Finally, you would or this to the bitmask that you already have. So,
+if your mask already is 6160, you would go 6160+8 which should do the trick.
+To or two values means to only add the new entry, in case it was not added
+previously, in a binary way.
+   </para>
+
+   <caution>
+    <para>
+Make absolutely sure that the ratemask does not contain the bitmask that you
+want to add. If you fail to notice such a problem, your ratemask will become
+totally wrong. If you have 256 set already, and then try to set 256 again
+according to this description, you will wind up with ICMP Echo Request unset,
+and ICMP type 9 set. ICMP type 9 does not exist.
+    </para>
+   </caution>
+
+   <para>
+The default value of this variable is 6168, which means that ICMP
+Destination Unreachable, ICMP Source Quench, ICMP Time Exceeded and ICMP
+Parameter Problem is in the mask. ICMP Destination Unreachable equals 3, ICMP
+Source Quench equals 4, ICMP Time Exceeded equals 11 and ICMP Parameter
+Problem equals 12. Hence, the default value is calculated like this:
+   </para>
+
+   <informalequation>
+    <alt>ratemask = 2^3 + 2^4 + 2^11 + 2^12</alt>
+    <graphic fileref="images/icmp_ratemask_ex"></graphic>
+   </informalequation>
+
+   <note>
+    <para>
+An attacker could cause a correctly operating host or router to flood a victim
+with ICMP replies by sending it packets that generate replies back to the
+(forged) source address of the victim. It is important in some cases to send
+such replies, but hardly ever important to generate them at a very high rate.
+    </para>
+   </note>
+
+   <tip>
+    <para>
+There is a small program to output the proper ICMP ratemask called
+ratemask, which is available at <ULINK
+URL="http://www.frozentux.net">http://www.frozentux.net</ULINK>. It may be
+of some help when creating icmp_ratemasks, or if you want to find out what
+the current value means.
+    </para>
+   </tip>
+
+  </section>
+
+  <section>
+   <title>igmp_max_memberships</title>
+
+   <para>
+This variable changes the maximum amounts of multicast groups we may
+subscribe to per socket. This is per default set to 20 and may be changed
+as needed.
+   </para>
+
+   <para>
+Fixme: NEED MORE DETAILS!!!
+   </para>
+
+  </section>
+ </section>
+
+ &confreference;
+
+ &neighreference;
+
+ &netfilterreference;
+
+ &routereference;
+
+</chapter>

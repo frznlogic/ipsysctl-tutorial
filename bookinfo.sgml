@@ -1,0 +1,243 @@
+ <bookinfo>
+  <title>Ipsysctl tutorial 1.0.4</title>
+
+  <author>
+   <firstname>Oskar</firstname>
+   <surname>Andreasson</surname>
+   <affiliation>
+    <address>
+     <email>blueflux@koffein.net</email>
+    </address>
+   </affiliation>
+  </author>
+
+  <copyright>
+   <year>2002</year>
+   <holder>Oskar Andreasson</holder>
+  </copyright>
+
+  <legalnotice>
+   <para> 
+Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU Free Documentation License, Version
+1.1; with the Invariant Sections being "Introduction" and all
+sub-sections, with the Front-Cover Texts being "Original Author: Oskar
+Andreasson", and with no Back-Cover Texts. A copy of the license is
+included in the section entitled "GNU Free Documentation License".
+   </para>
+   <para>
+All scripts in this tutorial are covered by the GNU General Public
+License. The scripts are free source; you can redistribute them and/or
+modify them under the terms of the GNU General Public License as published
+by the Free Software Foundation, version 2 of the License.
+   </para>
+   <para> These scripts are distributed in the hope that they will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.
+   </para>
+   <para> You should have received a copy of the GNU General Public
+License within this tutorial, under the section entitled "GNU General
+Public License"; if not, write to the Free Software Foundation, Inc., 59
+Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   </para>
+  </legalnotice>
+
+ </bookinfo>
+
+ <dedication>
+  <title>Dedications</title>
+
+  <para> This document is dedicated to all of you who send me reports of
+bugs and errors in what I have written, and to everyone else for that
+matter who reads this and other documentations in order to find errors and
+report them to the maintainers. This document is in other words dedicated
+to everyone who uses what others produce and release for free under the
+Free Licenses that are available.
+  </para>
+
+  <para>
+I would also like to dedicate this to my family who has understood me when
+I didn't deserve it, who whacked my head off for being a bum when I
+deserved it, and for being a generally nice bunch of people with a lot of
+humour.
+  </para>
+ </dedication>
+
+
+ <preface id="preface">
+  <title id="preface.title">Preface</title>
+
+ <section id="whythisdoc">
+  <title id="whythisdoc.title">Why this document</title>
+
+  <para> I started writing this documentation in the hopes that it would
+help people understand the IP options provided by Linux 2.4, and what you
+can do with these options. This is a plain text documentation, hoping to
+give the necessary understanding and help to configure your kernel on the
+fly, and to get it up and running in a way that suites you. A lot of these
+options can also be used to increase performance, as well as strengthen
+the security.  We will not discuss all the different sections of the
+sysctl in this document, but instead focus on the network sections of the
+system control, or sysctl as it is called. Hopefully this documentation
+will fill a gap in the documentation, and if you're reading this, it
+probably has. Mainly, there are no really good documentations detailing
+the whole structure of all the ipsysctl from what I have seen that
+documents all the networking options, except the ip-sysctl.txt file in the
+linux kernel documentation, which is really really brief in explaining
+what the options could be used for.
+  </para>
+
+  <para> I believe there is a lot of documentation out there detailing the
+usage of these options and variables, however, none of them brings them
+together and describes them in detail. If you found this document to be a
+good read, or interesting in general, feel free to donate, help out,
+translate, or whatever you feel like. The main thing of all however, send
+bugreports so I can update the document and see to it that there is no
+stale errors or problems due to changes in the kernel etcetera. If you
+find an sysctl command that has not been documented here, or is not
+listed, send me a mail and I will try to get it inserted as soon as
+possible.
+  </para>
+ </section>
+
+ <section id="intendedaudience">
+  <title id="intendedaudience.title">Intended audience & prerequisite knowledge</title>
+  <para>
+This document is intended for evyerone with an intermediate 
+through advanced understanding of TCP/IP as well as the Linux operating 
+system. You should understand TCP/IP fairly well, as well as understand 
+what a packet header is and what parts it consists of. You will also need 
+a lot of understanding of routing and the core of TCP/IP networking.
+  </para>
+
+  <para>
+In general, this document was not intended for the novice Linux user, but 
+you may have some luck checking through this document if you are 
+experiencing specific needs. Be absolutely 100% certain that you have 
+understood the variables in question before you do change them though, 
+since some of them may cause really interesting results. 
+  </para>
+
+  <para>
+This document should be readable by anyone who has a interest in computers 
+and computer networks in specific, and prerequisite knowledge. It is aimed 
+at giving a basic understanding of the different variables available 
+through the ipsysctl, but also to make it easier to go even further in 
+understanding what each specific variable do. 
+  </para>
+
+ </section>
+
+ <section id="howtoread">
+  <title id="howtoread.title">How to read</title>
+
+  <para> This documentation can be read any way you want. If there are
+specific sections you are interested in, read those. If you have never set
+a kernel variable in linux before in your life, read the first chapter
+after this and then read the sections you feel intrigued by. If you feel
+like reading it from top to bottom, do that. If you feel like reading it
+backwards to find hidden messages, do that. If you feel like reading in
+encrypted format, well, nothing is stopping you.
+  </para>
+
+
+  <para> What I am trying to say is the following, read the sections that
+you want to read and that you think would be informative to you, and if
+there is something you do not understand, read the corresponding bits
+either here or in some other document. I will not tell you how to read
+this document since everyone will probably have bits and pieces they
+already know how they work.
+  </para>
+
+ </section>
+
+ <section id="conventionsused">
+  <title id="conventionsused.title">Conventions used in this document</title>
+
+  <para>
+The following conventions are used in this document when it comes to 
+commands, files and other specific information.
+  </para>
+
+  <itemizedlist mark=bullet>
+
+   <listitem>
+    <para>
+Code excerpts and commandoutputs are printed like this, with all output 
+in fixed width font and userwritten commands in bold typeface:
+    </para>
+
+    <screen>
+[blueflux@work1 neigh]$ <command>ls</command>
+default  eth0  lo
+[blueflux@work1 neigh]$
+    </screen
+   </listitem>
+
+   <listitem>
+    <para>
+All commands and program names in the tutorial are shown in <command>bold 
+typeface</command>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+All system items such as hardware, and also kernel internals or abstract 
+system items such as the loopback interface are all shown in an 
+<systemitem>italic typeface</systemitem>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+computeroutput is formatted in <computeroutput>this way</computeroutput> 
+in the text.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+filenames and paths in the filesystem are shown like 
+<filename>/proc/sys/net</filename>.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+
+ <section id="acknowledgement">
+  <title id="acknowledgement.title">Acknowledgements</title>
+
+  <para>This document is loosely based upon the documentation found in 
+/usr/src/linux/Documentation/networking/ip-sysctl.txt. Before I say anything 
+else, I would like to thank the people who took the time to write that
+document. People who read both documents will find that this document has 
+borrowed some structure from it.
+  </para>
+ 
+  <para> I would like to acknowledge the work done by all the people
+working on the networking stack and the timeconsuming job they are putting
+into the Linux operating system. I hope I can give something back by
+writing this, and other documents, to the community and by giving the
+coders a little relief by maintaining documentation for what they have
+written.
+  </para>
+
+  <para> I would also like to acknowledge Fabrice Marie for the wonderful
+help and support with documentation standards and giving me a nudge in the
+right direction when there is something I did not get to work. Also, a
+huge thanks to all of the people at the netfilter mailing list
+for helping out with problems and questions, and the linuxsecurity people
+for listening to all of my rants and waiting for all of my excuses for not
+getting things published in time.
+  </para>
+
+  <para>
+In other words, a huge thanks to everyone for helping me out when I have
+problems and questions.
+  </para>
+
+ </section>
+ </preface>

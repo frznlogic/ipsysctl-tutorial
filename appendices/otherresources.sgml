@@ -1,0 +1,266 @@
+<appendix id="otherresources">
+ <title id="otherresources.title">Other resources</title>
+
+ <para>
+This is a list of different sources of information that I have used to get 
+more information about different behaviours and so on. Some resources may 
+have been left out on purpose while others where left out on mistake. If 
+you have any well written resource, let me know and I may add it here.
+ </para>
+
+ <para>
+  <itemizedlist>
+
+   <listitem id="rfc791">
+    <para>
+<ulink url="http://ipsysctl-tutorial.frozentux.net/other/rfc791.txt" 
+id="rfc791.title">RFC 791 - Internet Protocol</ulink> - The original document 
+specifying the IP protocol. This document was edited by J. Postel from the 
+DoD Standard Internet Protocol. 
+    </para>
+   </listitem>
+   
+   <listitem id="rfc792">
+    <para> 
+<ulink url="http://ipsysctl-tutorial.frozentux.net/other/rfc792.txt"  
+id="rfc792.title">RFC 792 - Internet Control Message Protocol</ulink> -
+The definitive resource for all information about ICMP packets. Whatever
+technical information you need about the ICMP protocol, this is where you
+should turn first. Written by J. Postel.
+    </para>
+   </listitem>
+
+   <listitem id="rfc793">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc793.txt"  
+id="rfc793.title">RFC 793 - Transmission Control Protocol</ulink> - This
+is the original resource on how TCP should behave on all hosts. This
+document has been the standard on how TCP should work since 1981 and
+forward. Extremely technical, but a must read for anyone who wants to
+learn TCP in every detail. This was originally a Department of Defense
+standard written by J. Postel.
+    </para>
+   </listitem>
+
+   <listitem id="rfc959">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc959.txt"  
+id="rfc959.title">RFC 959 - File Transfer Protocol</ulink> - This is the
+RFC documenting the FTP protocol and how it works. Originally written by
+J. Postel and J.  Reynolds.
+    </para>
+   </listitem>
+
+   <listitem id="rfc1072">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc1072.txt"  
+id="rfc1072.title">RFC 1072 - TCP Extensions for Long-Delay Paths</ulink>
+- This RFC discusses possible solutions to specific problems in paths or
+streams that have extremely long round-trip delay or extremely high
+bandwidth and what can be done about TCP sequence number reusing among
+other things. This RFC was obsoleted by RFC 1323, but is available here
+since it contains valuable information. This RFC was written by V.
+Jacobson and R. Braden.
+    </para>
+   </listitem>
+
+   <listitem id="rfc1122">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc1122.txt"  
+id="rfc1122.title">RFC 1122 - Requirements for Internet Hosts --
+Communication Layers</ulink> - This RFC specifies requirements for hosts
+that are working on the Internet. Edited by R. Braden and written by IETF.
+    </para>
+   </listitem>
+
+   <listitem id="rfc1123">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc1123.txt" 
+id="rfc1123.title">RFC 1123 - Requirements for Internet Hosts -- Application 
+and Support</ulink> - This document describes the requirements for all 
+internet hosts regarding the Application layer protocol, and all of their 
+supporting protocols and layers. It was edited by R. Braden
+    </para>
+   </listitem>
+
+   <listitem id="rfc1323">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc1323.txt"  
+id="rfc1323.title">RFC 1323 - TCP Extensions for High Performance</ulink>
+- This RFC obsoletes RFC 1072 previously described in this section. This
+RFC gives a brief explanation of possible problems with connections that
+have extremely long round-trip delays and/or extremely high bandwidth, as
+well as a set of solutions to this problem. This RFC was written by V.
+Jacobson, R. Braden and D. Borman.
+    </para>
+   </listitem>
+
+   <listitem id="rfc1337">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc1337.txt"  
+id="rfc1337.title">RFC 1337 - TIME-WAIT Assassination Hazards in
+TCP</ulink> - This RFC discusses a few possible failures that TCP
+connections may get into. It also discusses a few remedies to these
+problems, and identifies a simple fix that can be used. This RFC was
+written by R. Braden.
+    </para>
+   </listitem>
+
+   <listitem id="rfc1812">
+    <para> <ulink 
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc1812.txt" 
+id="rfc1812.title">RFC 1812 - Requirements for IP Version 4 
+Routers</ulink> - RFC 1812 discusses the requirements of all IPv4 routers. 
+This is a must read if you are in any way serious about your routing, or 
+if you need to implement anything that has to do with routing. This RFC is 
+based on 1716, which it also obsoletes, and was updated by F. Baker.
+    </para>
+   </listitem>
+
+   <listitem id="rfc2018">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc2018.txt"  
+id="rfc2018.title">RFC 2018 - TCP Selective Acknowledgement
+Options</ulink> - This RFC discusses the insertion of a new TCP Option
+called SACK, or Selective Acknowledgement, which gives better
+possibilities to acknowledge parts of a TCP window. Written by M. Mathis,
+J. Mahdavi, S. Floyd and A. Romanow.
+    </para>
+   </listitem>
+
+   <listitem id="rfc2883">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc2883.txt"  
+id="rfc2883.title">RFC 2883 - An Extension to Selective Acknowledgement
+(SACK) Option for TCP</ulink> - This RFC extends RFC 2018 and defines how
+to acknowledge duplicate incoming packets and how to handle these
+duplicate packets.  Written by S. Floyd, J. Mahdavi, M. Mathis and M.
+Podolsky.
+    </para>
+   </listitem>
+
+   <listitem id="rfc2884">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc2884.txt"  
+id="rfc2884.title">RFC 2884 - Performance Evaluation of Explicit
+Congestion Notification (ECN) in IP Networks</ulink> - This is a
+performance evaluation of ECN and how it works in IP networks. This is an
+informational RFC only, and contains no specific information on how ECN
+works. The RFC was written by J. Hadi Salim and U. Ahmed.
+    </para>
+   </listitem>
+
+   <listitem id="rfc3168">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/rfc3168.txt"  
+id="rfc3168.title">RFC 3168 - The Addition of Explicit Congestion
+Notification (ECN) to IP</ulink> - This RFC defines how ECN is to be used
+on a technical level and how it should be implemented in the TCP and IP
+protocols. Written by K. Ramakrishnan, S. Floyd and D. Black.
+    </para>
+   </listitem>
+
+   <listitem id="guideipunderlinux">
+    <para> <ulink 
+url="http://linux-ip.net/" id="guideipunderlinux.title">Guide to IP Layer 
+Network Administration with Linux</ulink> - A large guide covering how IP works 
+in Linux, and how to administrate it. It covers most tools, and common IP 
+concepts that may arise. Especially look closer at the ARP-flux problems 
+covered, which is a very good explanation.</para>
+   </listitem>
+
+   <listitem id="ecnunderlinux">
+    <para> <ulink url="http://gtf.org/garzik/ecn/"
+id="ecnunderlinux.title">ECN-under-Linux Unofficial Vendor Support 
+Page</ulink> - A great page which contains information about the ECN 
+problems, and a brief list of the most common hardware that is 
+problematic.
+    </para>
+   </listitem>
+
+   <listitem id="ecnexecsummary">
+    <para> <ulink
+url="http://www.uwsg.indiana.edu/hypermail/linux/kernel/0009.1/0329.html"
+id="ecnexecsummary.title">ECN: Executive Summary</ulink> - A mail sent to 
+the Linux kernel mailing list by Dax Kelson claiming 8% of the Internet is 
+unreachable with ECN enabled. This mail is dated in 2000, so this has 
+changed much by today.
+    </para>
+   </listitem>
+
+   <listitem id="tcptuningguide">
+   <para> <ulink
+url="http://www-didc.lbl.gov/TCP-tuning/TCP-tuning.html"
+id="tcptuningguide.title">TCP Tuning Guide</ulink> - A document discussing
+different measures one may take to tune TCP networks for better performance.
+It was written by a project group lead by Brian L. Tierney, DIDC (Data Intensive
+Distributed Computing group) at Lawrence Berkeley Labs. Most of this information
+does not apply to networks slower than giga ethernet.</para>
+   </listitem>
+
+   <listitem id="services">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/services.txt"  
+id="services.title">services.txt</ulink> - This is an example
+<filename>services</filename> file, which can be found in
+<filename>/etc/services</filename> on most Unix systems. This
+<filename>services</filename> file was grabbed from a Slackware 8.0
+system.
+    </para>
+   </listitem>
+
+   <listitem id="protocol">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/protocols.txt"  
+id="protocols.title">protocols.txt</ulink> - This simple file is normally
+hosted in every unix machine as <filename>/etc/protocols</filename>. The
+<filename>protocols</filename> file contains name and numbers representing
+all the different protocols in the IP layer. This file was taken from a
+default Slackware 8.0 machine.
+    </para>
+   </listitem>
+
+   <listitem id="ipsysctl.txt">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/ip-sysctl.txt"  
+id="ipsysctl.txt.title">ip-sysctl.txt</ulink> - This is the classical
+documentation for the ip-sysctl functions in the linux kernel. This
+document was taken out of the linux kernel 2.4.14 and has not evolved a
+lot in the last couple of months, as of writing this.
+    </para>
+   </listitem>
+
+   <listitem id="ipdynaddr.txt">
+    <para> <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/ip_dynaddr.txt"  
+id="ipdynaddr.txt.title">ip_dynaddr.txt</ulink> - This file contains
+information about the IPv4 ip_dynaddr option available in sysctl. This
+file was distributed with the linux kernel 2.4.14 and was originally
+written by JuanJo Ciarlante.
+    </para>
+   </listitem>
+
+   <listitem id="ipparam.txt">
+    <para>
+    <ulink
+url="http://ipsysctl-tutorial.frozentux.net/other/ip-param.txt"
+id="ipparam.txt.title">ip-param.txt</ulink> - This document contains
+information about IP Options mainly, and which RFC's to look in, to get
+more information about the specific IP options.
+    </para>
+   </listitem>
+
+   <listitem id="netdevmailing">
+    <para>
+    <ulink url="http://oss.sgi.com" id="netdevmailing.title">netdev
+mailinglist</ulink> - The netdev mailinglist is the main mailing list for the
+network developers in Linux. This is the final stop if you find something you
+don't understand or don't know how it works.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+
+ </para>
+
+</appendix>

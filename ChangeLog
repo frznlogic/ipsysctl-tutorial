@@ -1,0 +1,60 @@
+1.0.4 (21 May 2003)
+* Fixed missing pdf and ps format in homepage, bad Makefile.
+* Fixed static links in chunky.tgz and html.tgz.
+* Removed dead material in the Makefile.
+* Added changes.sh for chunky.tgz.
+* Added proper ID tags to all sections, chapters and prefaces.
+* Added ipv4/route/flush explanation.
+
+1.0.3 (26 Apr 2003)
+* Fixed minor details in icmp_ratemask and ratelimit (Don Cohen <don-lartcSNABELAisisDOTcs3-incDOTcom>)
+* Added explanation of jiffies in appendices.
+* Added explanation of arp_filter. (Martin A. Brown <martinSNABELAwonderfrogDOTnet>)
+* Added RFC 791 and 1123 (Don Cohen <don-lartcSNABELAisisDOTcs3-incDOTcom>).
+* Added TCP tuning information to the variable reference, with links to DIDC (Brian Tierney <bltierneySNABELAlblDOTgov>)
+* Added missing icmp_ratemask_ex.gif image.
+* Fixed up the Makefile to work 100% on Debian.
+* Moved all admonition images to images.
+* Removed stylesheet-images directory and in Makefile.
+* Fixed PostScript output again.
+* PDF format also works, miracuously. Will not support, but as long as it works...
+
+1.0.2 (19 Dec 2002)
+* CVS cleanup and restructuring.
+* Structured the route/ reference and added all proc entries.
+* Fixed tcp_syncookies caution since it is dubious if it's correct or not (several people).
+* Added short introduction to route reference.
+* Added explanation of error_burst.
+* Added explanation of error_cost.
+* Added id tags in all of route reference.
+* Fixed tcp_syncookies caution for good hopefully. (Alan Cox <alanSNABELAredhatDOTcom>, Michael T. Babcock <mbabcockSNABELAfibrespeedDOTnet>)
+* Fixed tcp_max_syn_backlog default value entry.
+* Fixed icmp_ratelimit and icmp_ratemask explanations (Don Cohen <donDASHlartcSNABELAisisDOTcs3DASHincDOTcom>)
+* Added a separate stylesheet tree.
+* Tried to fix all the make processes after moving to Debian.
+
+
+1.0.1 (23 Oct 2002)
+* Fixed some links in the tcp_ecn variable (William Stearns (wstearnsSNABELApoboxDOTcom>)
+* Fixed all bad links to boingworld.com (Don Gould <digSNABELAbvcDOTcomDOTau>)
+* Fixed eroneous ip_default_ttl values listed (Mattias Webjörn Eriksson <mattiasSNABELAwebjornDOTorg>)
+* Fixed igmp_max_memberships temporarily (Michael Bussmann <busSNABELAmb-netDOTnet>)
+* Added intended audience to preface of the document.
+* Fixed Makefile chunkyhtml and site targets to copy images correctly.
+* Fixed erroneous statement about default values on ipfrag_high/low_thresh variabels (Don Gould <digSNABELAbvcDOTcomDOTau>).
+* Fixed tcp_reordering explanation slightly. May still be wrong?
+* Fixed The /proc filesystem section in the introduction.
+* Clarified virtual filesystems and the /proc filesystem.
+* Some cleaning in the introduction.
+
+
+1.0.0 (8 Oct 2002)
+* Initial release. The following people have helped me out with
+several questions: 
+- Jozsef Kadlecsik <kadlecATblackholeDOTkfkiDOThu>, helped med with 
+several questions about the netfilter sysctl variables. 
+-Nivedita Singhvi <niveditaATusDOTibmDOTcom>, helped me with several of the
+core IPv4 variables. 
+- JuanJo Ciarlanti, some smaller corrections regarding ip_dynaddr.txt
+- Alexey Kuznetsov, huge help with the tcp_fack option and a few other 
+questions I've had during this time.

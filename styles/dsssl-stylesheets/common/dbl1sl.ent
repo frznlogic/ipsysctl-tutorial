@@ -1,0 +1,88 @@
+<!ENTITY Abstract	"Povzetek">
+<!ENTITY Answer		"O:">
+<!ENTITY Appendix	"Dodatek">
+<!ENTITY Article	"\U-010C;lanek">
+<!ENTITY Bibliography	"Literatura">
+<!ENTITY Book		"Knjiga">
+<!ENTITY CAUTION	"OPOZORILO">
+<!ENTITY Caution	"Opozorilo">
+<!ENTITY Chapter	"Poglavje">
+<!ENTITY Colophon	"Kolofon">
+<!ENTITY Copyright	"Pravna za\U-0161;\U-010D;ita">
+<!ENTITY Dedication	"Posvetilo">
+<!ENTITY Edition	"Izdaja">
+<!ENTITY Equation	"Ena\U-010D;ba">
+<!ENTITY Example	"Primer">
+<!ENTITY Figure		"Slika">
+<!ENTITY GlossSee	"glej">
+<!ENTITY GlossSeeAlso	"glej tudi">
+<!ENTITY Glossary	"Slovar\U-010D;ek">
+<!ENTITY IMPORTANT	"POMEMBNO">
+<!ENTITY ISBN		"ISBN">
+<!ENTITY Important	"Pomembno">
+<!ENTITY Index		"Stvarno kazalo">
+<!ENTITY LegalNotice	"Pravno sporo\U-010D;ilo">
+<!ENTITY MsgAud		"Ob\U-010D;instvo">
+<!ENTITY MsgLevel	"Raven">
+<!ENTITY MsgOrig	"Izvor">
+<!ENTITY NOTE		"OPOMBA">
+<!ENTITY Note		"Opomba">
+<!ENTITY Part		"Del">
+<!ENTITY Preface	"Predgovor">
+<!ENTITY Procedure	"Postopek">
+<!ENTITY Published	"Izdano">
+<!ENTITY Question	"V:">
+<!ENTITY RefEntry       "">
+<!ENTITY Reference	"Sklic">
+<!ENTITY RefName	"Ime">
+<!ENTITY RefSection     "">
+<!ENTITY RefSynopsisDiv "Sinopsis">
+<!ENTITY Revision	"Razli\U-010D;ica">
+<!ENTITY RevHistory	"Zgodovina razli\U-010D;ic">
+<!ENTITY Section	"Razdelek">
+<!ENTITY See		"glej">
+<!ENTITY SeeAlso	"glej tudi">
+<!ENTITY Set		"Postavi">                  <!-- ? -->
+<!ENTITY SetIndex	"Postavi stvarno kazalo">   <!-- ? -->
+<!ENTITY Sidebar	"">
+<!ENTITY Step		"Korak">
+<!ENTITY TIP		"NAMIG">
+<!ENTITY Table		"Tabela">
+<!ENTITY Tip		"Namig">
+<!ENTITY WARNING	"POZOR">
+<!ENTITY Warning	"Pozor">
+<!ENTITY appendix	"dodatek">
+<!ENTITY chapter	"poglavje">
+<!ENTITY section	"razdelek">
+<!ENTITY sidebar	"sidebar">   <!-- ? -->
+<!ENTITY step		"korak">
+<!ENTITY Seealso	"Glej tudi">
+
+<!ENTITY TableofContents	"Kazalo">
+<!ENTITY in		"v">
+<!ENTITY by		"od">              <!-- ? -->
+<!ENTITY Edited		"Urejeno">         <!-- ? -->
+<!ENTITY Editedby	"&Edited; &by;">   <!-- ? -->
+<!ENTITY and		"in">
+<!ENTITY Notes		"Notes">           <!-- ? -->
+<!ENTITY TableNotes     "Notes">           <!-- ? -->
+<!ENTITY nonexistantelement	"neobstoje\U-010D;i element">
+<!ENTITY Pgs 		"Str.">
+<!ENTITY unsupported	"nepodprto">
+<!ENTITY xrefto		"xref na">         <!-- ? -->
+<!ENTITY unexpectedelementname	"Nepri\U-010D;akovano ime elementa">
+<!ENTITY Revisedby      "Revised by: ">
+
+<!ENTITY ListofTables "Seznam tabel">
+<!ENTITY ListofExamples "Seznam primerov">
+<!ENTITY ListofFigures "Seznam slik">
+<!ENTITY ListofEquations "Seznam ena\U-010D;b">
+<!ENTITY ListofUnknown "Seznam neznanih stvari">   <!-- ? -->
+
+<!ENTITY nav-prev		"Nazaj">
+<!ENTITY nav-prev-sibling		"Hitro nazaj">
+<!ENTITY nav-next-sibling		"Hitro naprej">
+<!ENTITY nav-next		"Naprej">
+<!ENTITY nav-up		"Gor">
+<!ENTITY nav-home		"Domov">
+

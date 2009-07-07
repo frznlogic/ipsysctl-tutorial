@@ -1,0 +1,347 @@
+<chapter id="introduction">
+ <title id="introduction.title">Introduction</title>
+
+ <para> The <filename>/proc</filename> filesystem is a virtual
+filesystem, which means that it doesn't really exist except in the "head"
+of the Linux kernel. The <filename>/proc</filename> filesystem as
+described here is specific to the Linux kernel, even though it may very
+well be present in other operating systems as well, but with a different
+functionality and a different meaning.
+ </para>
+
+ <section>
+  <title>Virtual filesystems</title>
+
+  <para>
+By virtual filesystem, we simply mean that there is no trace of it on top 
+of any of your harddrives, which all filesystems would normally leave. 
+Nothing that you ever do to a virtual filesystem will 
+ever do any changes to the actual harddrives themselves, but only in the 
+primary memory. Virtual filesystems are created "on the fly" by the kernel 
+during bootup, and it is always updated every single time you enter the 
+filesystem, or do anything within it. 
+  </para>
+
+  <note>
+   <para>
+Virtual filesystems may take several other incarnations as well. One such 
+is a simple RAM Harddrive, where you will be able to save files while the 
+machine is running. On diskless Amigas this was often used to move files 
+from one floppy to another floppy by first moving the original file to the 
+RAM memory and then swap floppies and copy it to the new floppy. However, 
+these files would disappear as soon as you reset or restarted the machine.
+   </para>
+  </note>
+ </section>
+
+ <section id="theprocfilesystem">
+  <title id="theprocfilesystem.title">The /proc filesystem</title>
+  <para> The virtual filesystem that we call <filename>/proc</filename>
+contains loads and loads of different datastructures and information
+gathered from the kernel at runtime, and updated whenever you try to list
+or view the information. The information is all gathered and shown as a
+normal filesystem, and hence you can read files, traverse catalog
+structures, etcetera. Everything that you can do in a normal filesystem in
+other words. However, most of the files available through the
+<filename>/proc</filename> filesystem are only available read only, which
+means they can't be changed. This is because they only supply us with
+informational data.
+  </para>
+
+  <para> One section is read-writable on the other hand, and that section
+is placed within the <filename>/proc/sys</filename>. All of the variables
+located in this directory and subdirectories are writable as well as
+readable. 
+  </para>
+
+  <para>This document will focus on the Internet Protocol version 4 (IPv4)
+section of the <filename>/proc</filename> located in
+<filename>/proc/sys/net/ipv4</filename> which contains all the
+configurable settings for the IPv4 stack, including TCP, UDP, ICMP and ARP
+tunable settings
+  </para>
+ </section>
+
+ <section id="abriefproc">
+  <title id="abriefproc.title">A brief /proc walkthrough</title>
+
+  <para> 
+The <filename>/proc</filename> filesystem contains a few basic directories 
+and entries, which we will describe a little bit closer in this section 
+before we go on to the ipv4 system. 
+  </para>
+
+  <para> First of all, the filesystem contains a huge set of numbered
+directories that come and go. Each and one of these numbered directories
+contains information pertaining to all of the currently active processes
+on the machine. When a new process is started, a new directory is created
+in the /proc filesystem for it, and a lot of data is created within it
+regarding the process, such as the commandline with which the program was 
+started with, a link to the "current working directory", environment 
+variables, where the executable is located, and so on. 
+  </para>
+
+  <para>
+Except this, we also have quite a few files as well as directories in the 
+root of the /proc filesystem. This is a complete listing of them all:
+  </para>
+
+  <screen>
+[blueflux@work1 ]$ <command>ls -l /proc</command>
+total 0
+....
+-r--r--r--    1 root     root            0 Sep 19 18:09 apm
+dr-xr-xr-x    4 root     root            0 Sep 19 10:52 bus
+-r--r--r--    1 root     root            0 Sep 19 18:09 cmdline
+-r--r--r--    1 root     root            0 Sep 19 18:09 cpuinfo
+-r--r--r--    1 root     root            0 Sep 19 18:09 devices
+-r--r--r--    1 root     root            0 Sep 19 18:09 dma
+dr-xr-xr-x    4 root     root            0 Sep 19 18:09 driver
+-r--r--r--    1 root     root            0 Sep 19 18:09 execdomains
+-r--r--r--    1 root     root            0 Sep 19 18:09 fb
+-r--r--r--    1 root     root            0 Sep 19 18:09 filesystems
+dr-xr-xr-x    2 root     root            0 Sep 19 18:09 fs
+dr-xr-xr-x    4 root     root            0 Sep 19 18:09 ide
+-r--r--r--    1 root     root            0 Sep 19 18:09 interrupts
+-r--r--r--    1 root     root            0 Sep 19 18:09 iomem
+-r--r--r--    1 root     root            0 Sep 19 18:09 ioports
+dr-xr-xr-x   18 root     root            0 Sep 19 18:09 irq
+-r--------    1 root     root     268374016 Sep 19 18:09 kcore
+-r--------    1 root     root            0 Sep 19 10:52 kmsg
+-r--r--r--    1 root     root            0 Sep 19 18:09 ksyms
+-r--r--r--    1 root     root            0 Sep 19 18:09 loadavg
+-r--r--r--    1 root     root            0 Sep 19 18:09 locks
+-r--r--r--    1 root     root            0 Sep 19 18:09 mdstat
+-r--r--r--    1 root     root            0 Sep 19 18:09 meminfo
+-r--r--r--    1 root     root            0 Sep 19 18:09 misc
+-r--r--r--    1 root     root            0 Sep 19 18:09 modules
+lrwxrwxrwx    1 root     root           11 Sep 19 18:09 mounts -> self/mounts
+-rw-r--r--    1 root     root          208 Sep 19 11:02 mtrr
+dr-xr-xr-x    3 root     root            0 Sep 19 18:09 net
+dr-xr-xr-x    2 root     root            0 Sep 19 18:09 nv
+-r--r--r--    1 root     root            0 Sep 19 18:09 partitions
+-r--r--r--    1 root     root            0 Sep 19 18:09 pci
+dr-xr-xr-x    3 root     root            0 Sep 19 18:09 scsi
+lrwxrwxrwx    1 root     root           64 Sep 19 12:01 self -> 2864
+-rw-r--r--    1 root     root            0 Sep 19 18:09 slabinfo
+-r--r--r--    1 root     root            0 Sep 19 18:09 stat
+-r--r--r--    1 root     root            0 Sep 19 18:09 swaps
+dr-xr-xr-x   10 root     root            0 Sep 19 14:39 sys
+dr-xr-xr-x    2 root     root            0 Sep 19 18:09 sysvipc
+dr-xr-xr-x    4 root     root            0 Sep 19 18:09 tty
+-r--r--r--    1 root     root            0 Sep 19 18:09 uptime
+-r--r--r--    1 root     root            0 Sep 19 18:09 version
+[blueflux@work1 proc]$
+  </screen>
+
+  <para>
+Most of the information in the files are rather "human readable", except a 
+few of them. However, a few of them you should not touch, such as the 
+<filename>kcore</filename> file. The kcore file contains debugging 
+information regarding the kernel, and if you try to 'cat' it, your system 
+may very well hang up and die. If you try to copy it to a real file on the 
+harddrive, you will very soon have filled up your whole partition, and so 
+on. What all of this tells you is to be very careful. Mostly, none of the 
+variables or entries in the /proc filesystem is not dangerous to watch, 
+but a few of them are. A brief walkthrough of the most important files:
+  </para>
+
+  <itemizedlist mark=opencircle>
+
+   <listitem>
+    <para>
+<filename>cmdline</filename> - The command line issued when starting the 
+kernel.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>cpuinfo</filename> - Information about the <emphasis>Central 
+Processing Unit</emphasis>, who made it, known bugs, flags etcetera.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>dma</filename> - Contains information about all DMA channels 
+available, and which driver is using it.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>filesystems</filename> - Contains short information about every 
+single filesystem that the kernel supports.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>interrupts</filename> - Gives you a brief listing of all IRQ 
+channels, how many interrupts they have seen and what driver is actually 
+using it.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>iomem</filename> - A brief file containing all IO memory 
+mappings used by different drivers.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>ioports</filename> - Contains a brief listing of all IO ports 
+used by different drivers.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>kcore</filename> - Contains a complete memory dump. Do not cat 
+or anything like that, you may freeze your system. Mainly used to debug 
+the system.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>kmsg</filename> - Contains messages sent by kernel, is not and 
+should not be readable by users since it may contain vital information. 
+Main usage is to debug the system.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>ksyms</filename> - This contains the kernel symbol table, which 
+is mainly used to debug the kernel.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>loadavg</filename> - Gives the load average of the system during 
+the last 1, 5 and 15 minutes.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>meminfo</filename> - Contains information about memory usage on 
+the system.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>modules</filename> - Contains information about all currently 
+loaded modules in the kernel.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>mounts</filename> - Symlink to another file in the 
+<filename>/proc</filename> filesystem which contains information about all 
+mounted filesystems.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>partitions</filename> - Contains information about all 
+partitions found on all drives in the system.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>pci</filename> - Gives tons of hardware information about all 
+PCI devices on the system, also includes AGP devices and built in devices 
+which are connected to the PCI bus.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>swaps</filename> - Contains information about all swap 
+partitions mounted.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>uptime</filename> - Gives you the uptime of the computer since 
+it was last rebooted in seconds.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>version</filename> - Gives the exact version string of the 
+kernel currently running, including build date and gcc versions etcetera. 
+    </para>
+   </listitem>
+
+  </itemizedlist>
+
+  <para>
+And here is a list of the main directories and what you can expect to find 
+in there:
+  </para>
+
+  <itemizedlist mark=opencircle>
+
+   <listitem>
+    <para>
+<filename>bus</filename> - Contains information about all the buses, 
+hardware-wise, such as USB, PCI and ISA buses.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>ide</filename> - Contains information about all of the IDE buses 
+on systems that has IDE buses.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>net</filename> - Some basic information and statistics about the 
+different network systems compiled into the system.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>scsi</filename> - This directory contains information about SCSI 
+buses on SCSI systems. 
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+<filename>sys</filename> - Contains lots of variables that may be changed, 
+including the <filename>/proc/sys/net/ipv4</filename> which will be deeply 
+discussed in this document.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+
+  <para>
+As you can see, there is literally hundreds of files in the 
+<filename>/proc</filename> filesystem that may be read and checked for 
+information, and we haven't looked at half of them here. As has already 
+been said, we will only look closer on the ipv4 part and the variables 
+that are tunable through the <systemitem>sysctl</systemitem> inside the 
+<filename>/proc</filename> filesystem. 
+  </para>
+
+ </section>
+
+</chapter>

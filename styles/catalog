@@ -1,0 +1,5 @@
+PUBLIC "-//Oskar Andreasson//DTD DSSSL Style Sheet//EN" "tutorial.dsl"
+CATALOG sgml-iso/catalog
+CATALOG sgml-dtd-3.1/catalog
+CATALOG openjade/catalog
+CATALOG "dsssl-stylesheets/catalog"

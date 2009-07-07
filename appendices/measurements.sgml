@@ -1,0 +1,126 @@
+<appendix id="measurements">
+ <title id="measurements.title">Measurements used in kernel</title>
+
+ <section id="jiffies">
+  <title id="jiffies.title">Jiffies</title>
+
+  <para>
+Jiffies are the internal timeunits of the Linux kernel. This is based on the 
+HZ definition that you can find in /usr/include/asm/param.h on your own 
+system, and differs from different hardware architectures. For example, on 
+the i386 system this is set to 1/100s, and on the Alpha hardware it is set to 
+1/1024s. For a complete listing of the different values on different hardware
+architectures, see below.
+  </para>
+
+  <table frame=all id="table.jiffies">
+   <title id="table.jiffies.title">Jiffies on different hardware</title>
+   <tgroup cols=3 align=left colsep=1 rowsep=1>
+   <colspec colwidth="1*">
+   <colspec colwidth="1*">
+   <colspec colwidth="5*">
+    
+    <thead>
+     <row>
+      <entry>Architecture</entry>
+      <entry>Jiffies</entry>
+      <entry>Notes</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry>Alpha</entry>
+      <entry>1024</entry>
+      <entry>It seems to me that only AlphaServer 1200, 4000 and 4100 are set to 
+1024, if CONFIG_ALPHA_RAWHIDE is configured. If CONFIG_ALPHA_RAWHIDE is not
+set, then HZ is set to 1200. If anyone knows for sure about this, they are 
+welcome to contact me.</entry>
+     </row>
+     <row>
+      <entry>ARM</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>CRIS</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>i386</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>ia64</entry>
+      <entry>1024</entry>
+      <entry>Unless CONFIG_IA64_HP_SIM is configured. Then HZ is defined to 32
+since we will then simulate ia64 architecture, which is slow.</entry>
+     </row>
+     <row>
+      <entry>m68k</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>MIPS</entry>
+      <entry>100</entry>
+      <entry>You should better read the source of include/asm/param.h, since 
+this value vary quite a lot based on what kind of hardware you are running.
+      </entry>
+     </row>
+     <row>
+      <entry>MIPS64</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>PA-RISC</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>PPC</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>PPC-64</entry>
+      <entry>100</entry>
+      <entry>Once again, if you run this hardware, read the include/asm/param.h 
+to fully understand this value.
+      </entry>
+     </row>
+     <row>
+      <entry>S390</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>S390X</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>SH</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>Sparc</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+     <row>
+      <entry>Sparc64</entry>
+      <entry>100</entry>
+      <entry></entry>
+     </row>
+    </tbody>
+   </tgroup>
+</table>
+
+</section>
+
+</appendix>
