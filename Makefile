@@ -110,12 +110,12 @@ chunkyhtml:
 
 %.pdf.gz : %.sgml
 	@echo "Building PDF version..."
-	@mkdir -p pdf; cp -R images licensing scripts appendices \
+	mkdir -p pdf; cp -R images licensing scripts appendices \
 	 chapters styles *.sgml pdf; cd pdf; jw -b \
-	 pdf -d styles/tutorial.dsl -c styles/catalog $*.sgml; cd ..
-	@mv pdf/$*.pdf ./
-	@rm -rf pdf
-	@gzip $*.pdf
+	 pdf -d styles/tutorial.dsl  $*.sgml; cd ..
+	mv pdf/$*.pdf ./
+	rm -rf pdf
+	gzip $*.pdf
 
 %.ps.gz : %.sgml
 	@echo "Building PS version..."
